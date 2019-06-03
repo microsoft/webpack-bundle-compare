@@ -1,0 +1,9 @@
+@import './variables.scss';
+
+:export {
+  colorDark: $color-dark;
+  colorMedium: $color-medium;
+  colorPink: $color-pink;
+  colorYellow: $color-yellow;
+  colorBlue: $color-blue;
+}

@@ -1,0 +1,17 @@
+@import './variables.scss';
+
+.wrapper {
+  margin: 32px;
+  padding: 16px;
+  background: $color-dark;
+  border-radius: 4px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}

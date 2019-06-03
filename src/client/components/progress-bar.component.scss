@@ -1,0 +1,19 @@
+@import './variables.scss';
+
+$bar-height: 9px;
+
+.progressbar {
+  padding: 5px;
+  border-radius: 100px;
+  background: linear-gradient(rgba(#000, 0.5), rgba(#fff, 0.2));
+  margin: 20px;
+  transition: width 300ms;
+
+  > div {
+    height: $bar-height;
+    background: linear-gradient(90deg, $color-pink, darken($color-pink, 10%));
+    border-radius: 100px;
+    min-width: $bar-height;
+    box-shadow: inset 0 1px rgba(#fff, 0.1);
+  }
+}

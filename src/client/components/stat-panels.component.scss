@@ -1,0 +1,33 @@
+.panel {
+  max-width: 300px;
+  color: #1c0658;
+  padding: 8px;
+
+  + .panel {
+    margin-top: 16px;
+  }
+}
+
+.title {
+  display: block;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.value,
+.delta {
+  display: block;
+  text-align: right;
+  font-family: var(--font-family-mono);
+  font-size: 20px;
+  margin-top: 8px;
+}
+
+.delta {
+  cursor: pointer;
+}
+
+.value {
+  font-size: 40px;
+  margin-top: 16px;
+}

@@ -1,0 +1,24 @@
+$color-dark: #1c0658;
+$color-medium: #5c2686;
+$color-pink: #ff1690;
+$color-yellow: #f4d676;
+$color-blue: #36cdc4;
+
+@mixin gradient-border($gradient, $background, $width: 1px) {
+  background: $gradient;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: $width;
+    left: $width;
+    bottom: $width;
+    right: $width;
+    z-index: -1;
+    background: $background;
+  }
+
+  a {
+    cursor: pointer;
+  }
+}

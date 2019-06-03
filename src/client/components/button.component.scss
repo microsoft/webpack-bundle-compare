@@ -1,0 +1,50 @@
+@import './variables';
+
+@mixin variant($name, $color) {
+  &[data-variant*="#{$name}"] {
+    background: linear-gradient(lighten($color, 10%), darken($color, 10%));
+
+    &:hover {
+      background: darken($color, 15%);
+    }
+
+    &[disabled] {
+      background: darken($color, 15%);
+    }
+  }
+}
+
+@mixin size($name, $hpad, $wpad, $min-width) {
+  &[data-variant*="#{$name}"] {
+    padding: $hpad $wpad;
+    width: $min-width;
+  }
+}
+
+.button {
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  outline: 0 !important;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5), inset 0 1px rgba(255, 255, 255, 0.3);
+
+  @include variant('pink', $color-pink);
+  @include variant('yellow', $color-yellow);
+  @include variant('blue', $color-blue);
+
+  @include size('small', 8px, 16px, 100px);
+  @include size('normal', 8px, 16px, 100px);
+
+  &[disabled] {
+    color: rgba(#fff, 0.5);
+    cursor: default;
+    box-shadow: none;
+  }
+
+  &:active {
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5), inset 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+}
