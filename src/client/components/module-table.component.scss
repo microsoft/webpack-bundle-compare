@@ -8,37 +8,37 @@
 .plot :global {
   .public_fixedDataTable_header,
   .public_fixedDataTable_hasBottomBorder {
-    border-color: $color-dark;
+    border-color: rgba(#000, 0.1);
   }
 
   .public_fixedDataTable_scrollbarSpacer {
-    background: $color-dark;
+    background: rgba(#000, 0.1);
   }
 
   .public_fixedDataTable_header,
   .public_fixedDataTable_header .public_fixedDataTableCell_main {
-    background: darken($color-dark, 3%);
+    background: none;
   }
 
   .public_fixedDataTable_footer .public_fixedDataTableCell_main {
     background: #f6f7f8;
-    border-color: $color-dark;
+    border-color: rgba(#000, 0.1);
   }
 
   .public_fixedDataTable_horizontalScrollbar .public_Scrollbar_mainHorizontal,
   .public_fixedDataTableRow_main {
-    background-color: $color-dark;
+    background-color: rgba(#000, 0.1);
   }
 
   .public_fixedDataTableCell_main {
-    background-color: $color-dark;
-    border-color: darken($color-dark, 3%);
+    background: none;
+    border-color: rgba(#000, 0.3);
   }
 
   .public_fixedDataTableCell_highlighted,
   .public_fixedDataTableRow_highlighted,
   .public_fixedDataTableRow_highlighted .public_fixedDataTableCell_main {
-    background-color: darken($color-dark, 2%);
+    background: none;
   }
 
   .public_fixedDataTableCell_cellContent {
@@ -47,18 +47,24 @@
   }
 
   .public_fixedDataTable_header .public_fixedDataTableCell_main {
-    font-weight: bold;
+    font-family: var(--font-family-mono);
     color: #fff;
+    text-transform: uppercase;
+    font-weight: normal;
   }
 
   .public_Scrollbar_main,
   .public_Scrollbar_mainOpaque:hover,
   .public_Scrollbar_faceActive:after {
     border: none;
-    background: $color-dark;
+    background: rgba(#000, 0.1);
   }
 
   .public_Scrollbar_face:after {
     background: rgba(#fff, 0.3);
   }
+}
+
+.muted {
+  color: rgba(#fff, 0.3);
 }

@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const { DefinePlugin } = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -47,6 +48,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Webpack Bundle Compare',
     }),
+    new CopyPlugin([{ from: path.join(__dirname, 'public'), to: 'public' }]),
     new DefinePlugin({
       INITIAL_FILES: process.env.WBC_FILES
         ? JSON.stringify(process.env.WBC_FILES.split(','))
@@ -54,6 +56,6 @@ module.exports = {
     }),
   ],
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
+    disableHostCheck: true,
   },
 };

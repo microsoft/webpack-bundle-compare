@@ -1,6 +1,7 @@
 @import './variables.scss';
 
 $bar-height: 9px;
+$indefinite-width: 10%;
 
 .progressbar {
   padding: 5px;
@@ -15,5 +16,22 @@ $bar-height: 9px;
     border-radius: 100px;
     min-width: $bar-height;
     box-shadow: inset 0 1px rgba(#fff, 0.1);
+  }
+}
+
+.indefinite {
+  > div {
+    width: $indefinite-width;
+    animation: indeterminate-animation alternate infinite 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+}
+
+@keyframes indeterminate-animation {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX((100% / $indefinite-width - 1) * 100%);
   }
 }

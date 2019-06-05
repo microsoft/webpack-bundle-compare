@@ -1,19 +1,19 @@
+import { IRetrievalError, RetrievalState } from '@mixer/retrieval';
 import * as React from 'react';
-import * as styles from './enter-urls.component.scss';
-import { Button } from './button.component';
 import { connect } from 'react-redux';
-import {
-  getBundleUrls,
-  IAppState,
-  BundleStateMap,
-  getGroupedBundleState,
-  getBundleErrors,
-} from '../reducer';
-import { RetrievalState, IRetrievalError } from '@mixer/retrieval';
-import { loadAllUrls, clearLoadedBundles } from '../actions';
-import { ProgressBar } from './progress-bar.component';
-import { Errors } from './errors.component';
 import { Redirect } from 'react-router-dom';
+import { clearLoadedBundles, loadAllUrls } from '../redux/actions';
+import {
+  BundleStateMap,
+  getBundleErrors,
+  getBundleUrls,
+  getGroupedBundleState,
+  IAppState,
+} from '../redux/reducer';
+import { Button } from './button.component';
+import * as styles from './enter-urls.component.scss';
+import { Errors } from './errors.component';
+import { ProgressBar } from './progress-bar.component';
 
 interface IProps {
   defaultUrls: string[];

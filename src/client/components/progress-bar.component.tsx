@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as styles from './progress-bar.component.scss';
+import { classes } from './util';
 
 interface IProps {
   progress: number;
@@ -14,5 +15,11 @@ export const ProgressBar: React.FC<IProps> = props => (
     aria-valuenow={Math.round(props.progress * 100)}
   >
     <div style={{ width: `${props.progress * 100}%` }} />
+  </div>
+);
+
+export const IndefiniteProgressBar: React.FC = () => (
+  <div className={classes(styles.progressbar, styles.indefinite)}>
+    <div />
   </div>
 );

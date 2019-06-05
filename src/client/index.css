@@ -48,3 +48,18 @@ input {
 textarea:focus {
   border-color: #ff1690;
 }
+
+h2 {
+  margin: 32px 0 16px;
+}
+
+h2 small {
+  display: block;
+  font-size: 0.6em;
+  margin-top: 0.5em;
+}
+
+a {
+  color: #36cdc4;
+  text-decoration: none;
+}

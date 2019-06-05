@@ -1,16 +1,17 @@
 import {
+  error,
+  idleRetrieval,
+  IRetrievalError,
   Retrieval,
   RetrievalState,
-  idleRetrieval,
-  workingRetrival,
   success,
-  error,
-  IRetrievalError,
+  workingRetrival,
 } from '@mixer/retrieval';
 import { createSelector } from 'reselect';
-import { CompareAction, doAnalysis, clearLoadedBundles } from './actions';
 import { getType } from 'typesafe-actions';
 import { Stats } from 'webpack';
+import { clearLoadedBundles, CompareAction, doAnalysis, fetchBundlephobiaData } from './actions';
+import { IBundlephobiaStats } from './services/bundlephobia-api';
 
 /**
  * Possible error codes.
@@ -25,15 +26,21 @@ export interface IAppState {
    * List of bundle loading states.
    */
   bundles: Readonly<{ [url: string]: Retrieval<Stats.ToJsonOutput> }>;
+
+  /**
+   * Mapping of bundlephobia dependency information.
+   */
+  bundlephobiaData: { [moduleName: string]: Retrieval<IBundlephobiaStats> };
 }
 
 declare const INITIAL_FILES: string[];
 
 const initialState: IAppState = {
   bundles: INITIAL_FILES.reduce((acc, key) => ({ ...acc, [key]: idleRetrieval }), {}),
+  bundlephobiaData: {},
 };
 
-export const reducer = (state = initialState, action: CompareAction) => {
+export const reducer = (state = initialState, action: CompareAction): IAppState => {
   switch (action.type) {
     case getType(clearLoadedBundles):
       return {
@@ -65,6 +72,27 @@ export const reducer = (state = initialState, action: CompareAction) => {
       return {
         ...state,
         bundles: { ...state.bundles, [action.payload.url]: idleRetrieval },
+      };
+    case getType(fetchBundlephobiaData.request):
+      return {
+        ...state,
+        bundlephobiaData: { ...state.bundlephobiaData, [action.payload.name]: workingRetrival },
+      };
+    case getType(fetchBundlephobiaData.success):
+      return {
+        ...state,
+        bundlephobiaData: {
+          ...state.bundlephobiaData,
+          [action.payload.name]: success(action.payload),
+        },
+      };
+    case getType(fetchBundlephobiaData.failure):
+      return {
+        ...state,
+        bundlephobiaData: {
+          ...state.bundlephobiaData,
+          [action.payload.name]: error(action.payload),
+        },
       };
     default:
       return state;
@@ -145,3 +173,9 @@ export const getGroupedBundleState = createSelector(
     return status;
   },
 );
+
+/**
+ * Retrieves bundlephovia data for the given module name.
+ */
+export const getBundlephobiaData = (state: IAppState, moduleName: string) =>
+  state.bundlephobiaData[moduleName] || idleRetrieval;

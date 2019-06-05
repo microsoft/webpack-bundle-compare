@@ -1,0 +1,37 @@
+@import './variables.scss';
+
+.tip {
+  font-size: 1.1em;
+  line-height: 1.5em;
+  padding-left: 32px;
+  position: relative;
+  padding-top: 1em;
+
+  + .tip {
+    margin-top: 1em;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  small {
+    font-size: 0.7em;
+    color: rgba(#fff, 0.7);
+    display: block;
+    font-size: 0.9em;
+  }
+
+}
+
+.icon {
+  position: absolute;
+  top: 1em;
+  left: 0;
+  font-size: 1.5em;
+
+  .suggestion & {
+    color: $color-yellow;
+  }
+
+  .awesome & {
+    color: $color-blue;
+  }
+}

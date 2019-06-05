@@ -1,0 +1,105 @@
+@import '../variables.scss';
+
+.panel {
+  color: rgba(#fff, 0.4);
+  background: rgba(#000, 0.1);
+  padding: 8px;
+  position: relative;
+
+  + .panel {
+    margin-top: 16px;
+  }
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(#fff, 0.1);
+    }
+  }
+}
+
+.hint {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 24px;
+}
+
+.title {
+  color: #fff;
+  display: block;
+  text-transform: uppercase;
+  font-family: var(--font-family-mono);
+  font-size: 0.8em;
+}
+
+.value,
+.delta {
+  display: block;
+  font-weight: 200;
+  font-size: 20px;
+  margin-top: 8px;
+}
+
+.delta {
+  cursor: pointer;
+  display: flex;
+}
+
+.value {
+  font-size: 40px;
+}
+
+.arrangement {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -1rem -0.5rem;
+
+  .panel {
+    flex-basis: 100%;
+    margin: 1rem 0.5rem;
+
+    @media only screen and (min-width: 48em) {
+      flex-basis: calc(33% - 1rem);
+    }
+  }
+}
+
+.arrow {
+  border: 0.5em solid transparent;
+  border-bottom-color: currentColor;
+  width: 1px;
+  height: 1px;
+  transform: scaleX(0.5) translateY(33%) rotate(180deg);
+  display: inline-block;
+
+  &.up {
+    transform: scaleX(0.5) translateY(-10%) rotate(0deg);
+  }
+}
+
+.moduleType {
+  font-size: 0.7em;
+  color: $color-dark;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+
+  svg {
+    font-size: 1.5em;
+  }
+
+  &.shake {
+    color: $color-blue;
+  }
+
+  &.cjs {
+    background: $color-pink;
+  }
+
+  &.mixed {
+    background: $color-yellow;
+  }
+}

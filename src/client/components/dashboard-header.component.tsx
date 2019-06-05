@@ -1,29 +1,35 @@
-import * as React from 'react';
-import {
-  IoIosCalendar,
-  IoIosArrowRoundForward,
-  IoIosWarning,
-  IoIosCloseCircleOutline,
-  IoIosArrowBack,
-} from 'react-icons/io';
-import { IconType } from 'react-icons';
-import { Stats } from 'webpack';
-import { Link } from 'react-router-dom';
-import * as styles from './dashboard-header.component.scss';
 import * as dayjs from 'dayjs';
+import * as React from 'react';
+import { IconType } from 'react-icons';
+import {
+  IoIosArrowBack,
+  IoIosArrowRoundForward,
+  IoIosCalendar,
+  IoIosCloseCircleOutline,
+  IoIosWarning,
+} from 'react-icons/io';
+import { Link, withRouter } from 'react-router-dom';
+import { Stats } from 'webpack';
+import * as styles from './dashboard-header.component.scss';
 
-const DashboardHeaderItem: React.FC<{ icon: IconType; href?: string }> = props => {
+const DashboardHeaderItem: React.FC<{ icon: IconType; href?: string | (() => void) }> = props => {
   const inner = (
     <>
       <props.icon className={styles.icon} /> {props.children}
     </>
   );
-  return props.href ? (
+  return typeof props.href === 'string' ? (
     <Link to={props.href} className={styles.item}>
       {inner}
     </Link>
   ) : (
-    <span className={styles.item}>{inner}</span>
+    <span
+      className={styles.item}
+      onClick={props.href}
+      style={{ cursor: props.href ? 'pointer' : undefined }}
+    >
+      {inner}
+    </span>
   );
 };
 
@@ -68,8 +74,8 @@ export const DashboardErrorCount: React.FC<{ last: Stats.ToJsonOutput }> = ({ la
   </DashboardHeaderItem>
 );
 
-export const DashboardClose: React.FC = () => (
-  <DashboardHeaderItem icon={IoIosArrowBack} href="/">
-    Back to URLs
+export const DashboardClose = withRouter(props => (
+  <DashboardHeaderItem icon={IoIosArrowBack} href={() => props.history.goBack()}>
+    Back
   </DashboardHeaderItem>
-);
+));

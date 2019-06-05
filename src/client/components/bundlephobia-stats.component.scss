@@ -1,0 +1,22 @@
+.wrapper {
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.8);
+
+  :global .row {
+    margin-top: 16px;
+  }
+
+  p {
+    line-height: 1.5em;
+  }
+}
+
+.icons {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 2.5em;
+
+  a {
+    margin-right: 0.5em;
+  }
+}

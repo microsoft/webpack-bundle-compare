@@ -1,0 +1,69 @@
+@import '../variables.scss';
+
+.button {
+  background: none;
+  border: none;
+  color: currentColor;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(#000, 0.3);
+}
+
+.contents {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 50px;
+  padding: 50px;
+  border-radius: 4px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+  background: linear-gradient($color-medium, $color-dark);
+
+  h2:first-child {
+    margin-top: 0;
+  }
+
+  p {
+    line-height: 1.5em;
+  }
+
+  h3 {
+    margin: 32px 0 16px;
+  }
+
+  li {
+    margin-left: 20px;
+
+    + li {
+      margin-top: 4px;
+    }
+  }
+
+  code {
+    font-size: 0.8em;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    padding: 0.1em;
+  }
+}

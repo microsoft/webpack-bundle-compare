@@ -1,7 +1,7 @@
-import { Observable, EMPTY } from 'rxjs';
-import { CompareAction, webworkerErrored, doAnalysis } from '../actions';
-import { ErrorCode } from '../reducer';
+import { EMPTY, Observable } from 'rxjs';
 import { getType } from 'typesafe-actions';
+import { CompareAction, doAnalysis, webworkerErrored } from '../redux/actions';
+import { ErrorCode } from '../redux/reducer';
 import { download } from './download';
 
 const ctx: Worker = self as any;

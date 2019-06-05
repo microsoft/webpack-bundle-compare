@@ -1,0 +1,52 @@
+.importBox {
+  background: rgba(#000, 0.1);
+  font-family: var(--font-family-mono);
+
+  + .importBox {
+    margin-top: 32px;
+  }
+}
+
+.identifier {
+  font-size: 0.9em;
+  padding: 8px;
+  border-bottom: 1px solid rgba(#fff, 0.1);
+}
+
+.title {
+  align-items: center;
+  display: flex;
+}
+
+.filename {
+  font-size: 0.9em;
+  margin-bottom: 0.3em;
+}
+
+.reason {
+  padding: 12px 8px;
+
+  &:nth-child(odd) {
+    background-color: rgba(#fff, 0.05);
+  }
+}
+
+.fakeLine, .issuer {
+  font-size: 0.8em;
+  em {
+    width: 30px;
+    display: inline-block;
+    text-align: right;
+    margin-right: 1em;
+    color: rgba(#fff, 0.5);
+    font-style: normal;
+  }
+}
+
+.issuer {
+  margin-top: 8px;
+
+  li {
+    list-style-type: none;
+  }
+}

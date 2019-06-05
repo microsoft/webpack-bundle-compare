@@ -3,15 +3,15 @@
 .wrapper {
   margin: 32px;
   padding: 16px;
-  background: $color-dark;
+  background: rgba(#000, 0.4);
   border-radius: 4px;
-  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 50px rgba(#000, 0.3);
 }
 
 .header {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(#fff, 0.1);
   padding-bottom: 16px;
   margin-bottom: 16px;
 }

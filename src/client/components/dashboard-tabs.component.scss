@@ -1,0 +1,36 @@
+@import './variables.scss';
+
+.tabs {
+  :global {
+    .react-tabs__tab-list {
+      display: flex;
+      padding: 8px;
+      background: rgba(#000, 0.2);
+    }
+
+    .react-tabs__tab {
+      list-style-type: none;
+      padding: 8px 32px;
+      border-radius: 3px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-family: var(--font-family-mono);
+      font-size: 0.8em;
+
+      &--selected {
+        background: $color-pink;
+        color: $color-dark;
+      }
+    }
+
+
+    .react-tabs__tab-panel {
+      display: none;
+      background: rgba(#000, .1);
+
+      &--selected {
+        display: block;
+      }
+    }
+  }
+}
