@@ -1,4 +1,5 @@
 import * as cytoscape from 'cytoscape';
+import { Base64 } from 'js-base64';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { Stats } from 'webpack';
@@ -52,7 +53,8 @@ export const ChangedModuleGraph = withRouter(
       );
     }
 
-    private readonly onClick = (nodeId: string) => {
+    private readonly onClick = (encodedId: string) => {
+      const nodeId = Base64.decode(encodedId);
       const nodeModule = getNodeModuleFromIdentifier(nodeId);
       this.props.history.push(nodeModule ? linkToNodeModule(nodeModule) : linkToModule(nodeId));
     };

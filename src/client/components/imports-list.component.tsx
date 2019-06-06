@@ -64,12 +64,15 @@ export const IssuerTree: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }
   );
 
 const ImportReason: React.FC<{ reason: Stats.Reason }> = ({ reason }) => {
-  const request = replaceLoaderInIdentifier(reason.userRequest);
+  const request = reason.userRequest
+    ? replaceLoaderInIdentifier(reason.userRequest)
+    : reason.moduleName;
+
   return (
     <div className={styles.reason}>
       <div className={styles.filename}>{reason.module}</div>
       <div className={styles.fakeLine}>
-        <em>{reason.loc.split(':')[0]}</em>
+        <em>{reason.loc ? reason.loc.split(':')[0] : '?'}</em>
         {reason.type && reason.type.includes('harmony')
           ? `import "${request}"`
           : `require("${request}")`}

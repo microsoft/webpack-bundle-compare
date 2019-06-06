@@ -7,8 +7,8 @@ const anyPathSeparator = /\/|\\/;
  * Replaces the loader path in an identifier.
  * '(<loader expression>!)?/path/to/module.js'
  */
-export const replaceLoaderInIdentifier = (identifier: string) =>
-  identifier.replace(loaderRegex, '');
+export const replaceLoaderInIdentifier = (identifier?: string) =>
+  identifier ? identifier.replace(loaderRegex, '') : '';
 
 /**
  * Normalizes an identifier so that it carries over time: removing the

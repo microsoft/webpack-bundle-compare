@@ -1,4 +1,5 @@
 import * as cytoscape from 'cytoscape';
+import { Base64 } from 'js-base64';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { Stats } from 'webpack';
@@ -80,7 +81,7 @@ const createDependentGraph = <P extends {}>(
           [edge.data.source, edge.data.target] = [edge.data.target, edge.data.source];
         }
 
-        nodes.push({
+        nodes.unshift({
           data: {
             id: 'index',
             label: rootLabel(this.props),
@@ -92,10 +93,11 @@ const createDependentGraph = <P extends {}>(
         });
 
         for (const direct of directImports) {
+          const directId = Base64.encodeURI(normalizeIdentifier(direct.identifier));
           edges.push({
             data: {
-              id: `${direct.identifier}toIndex`,
-              source: direct.identifier,
+              id: `${directId}toIndex`,
+              source: directId,
               target: 'index',
             },
           });
@@ -104,7 +106,8 @@ const createDependentGraph = <P extends {}>(
         return { nodes, edges, entries: ['index'] };
       }
 
-      private readonly onClick = (nodeId: string) => {
+      private readonly onClick = (encodedId: string) => {
+        const nodeId = Base64.decode(encodedId);
         const nodeModule = getNodeModuleFromIdentifier(nodeId);
         this.props.history.push(nodeModule ? linkToNodeModule(nodeModule) : linkToModule(nodeId));
       };

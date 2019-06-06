@@ -1,8 +1,8 @@
 import * as cytoscape from 'cytoscape';
 import * as filesize from 'filesize';
+import { Base64 } from 'js-base64';
 import * as React from 'react';
 import { IoIosContract, IoIosExpand } from 'react-icons/io';
-import { Stats } from 'webpack';
 import {
   getReasons,
   IWebpackModuleComparisonOutput,
@@ -23,11 +23,21 @@ interface IProps {
   onClick?(nodeId: string): void;
 }
 
-export class BaseGraph extends React.PureComponent<IProps> {
+const enum FilterState {
+  NoFilter,
+  DidFilter,
+  RemovedFiler,
+}
+
+const nodeHideThreshold = 100;
+const labelHideThreshold = 100;
+
+export class BaseGraph extends React.PureComponent<IProps, { filter: FilterState }> {
+  public state = { filter: FilterState.NoFilter };
+
   private readonly container = React.createRef<HTMLDivElement>();
   private mountTimeout?: number | NodeJS.Timeout;
   private graph?: cytoscape.Core;
-
   private readonly zoomIn = this.createZoomFn(1);
   private readonly zoomOut = this.createZoomFn(-1);
 
@@ -56,6 +66,12 @@ export class BaseGraph extends React.PureComponent<IProps> {
       <div className={styles.container}>
         <div ref={this.container} style={{ width: this.props.width, height: this.props.height }} />
         <div className={styles.controls}>
+          {this.state.filter === FilterState.DidFilter && (
+            <>
+              For performance reasons, only part of the graph is shown.{' '}
+              <a onClick={this.unfilter}>Click here</a> to show the entire graph.
+            </>
+          )}
           <button onClick={this.zoomIn}>
             <IoIosExpand />
           </button>
@@ -76,19 +92,30 @@ export class BaseGraph extends React.PureComponent<IProps> {
     };
   }
 
-  private draw(container: HTMLDivElement) {
+  private draw(container: HTMLDivElement, filter: FilterState = this.state.filter) {
+    let { nodes, edges } = this.props;
+    if (nodes.length > nodeHideThreshold && filter !== FilterState.RemovedFiler) {
+      nodes = nodes.slice(0, nodeHideThreshold);
+      edges = filterUnattachedEdges(nodes, edges);
+      this.setState({ filter: FilterState.DidFilter });
+    }
+
+    if (this.graph) {
+      this.graph.destroy();
+    }
+
     const graph = cytoscape({
       container,
       boxSelectionEnabled: false,
       autounselectify: true,
       userZoomingEnabled: false,
       layout: { name: 'fcose', animate: false, nodeSeparation: 150, quality: 'proof' } as any,
-      elements: { nodes: this.props.nodes, edges: this.props.edges },
+      elements: { nodes, edges },
       style: [
         {
           selector: 'node',
           style: {
-            label: 'data(label)',
+            label: nodes.length < labelHideThreshold ? 'data(label)' : undefined,
             width: 'data(width)',
             height: 'data(width)',
             color: 'data(fontColor)',
@@ -99,6 +126,7 @@ export class BaseGraph extends React.PureComponent<IProps> {
         {
           selector: 'node.hover',
           style: {
+            label: 'data(label)',
             'background-color': '#fff',
           },
         },
@@ -123,12 +151,7 @@ export class BaseGraph extends React.PureComponent<IProps> {
       ],
     });
 
-    if (this.graph) {
-      this.graph.destroy();
-    }
-
     this.graph = graph;
-
     this.attachPathHoverHandle(graph);
     this.attachClickListeners(graph);
     this.attachMouseoverStyles(graph);
@@ -188,7 +211,33 @@ export class BaseGraph extends React.PureComponent<IProps> {
       }
     });
   }
+
+  private readonly unfilter = () => {
+    if (this.container.current) {
+      this.draw(this.container.current, FilterState.RemovedFiler);
+      this.setState({ filter: FilterState.NoFilter });
+    }
+  };
 }
+
+export const filterUnattachedEdges = (
+  nodes: cytoscape.NodeDefinition[],
+  edges: cytoscape.EdgeDefinition[],
+) => {
+  const nodeIds = new Set();
+  for (const node of nodes) {
+    nodeIds.add(node.data.id);
+  }
+
+  const outEdges: cytoscape.EdgeDefinition[] = [];
+  for (const edge of edges) {
+    if (nodeIds.has(edge.data.source) && nodeIds.has(edge.data.target)) {
+      outEdges.push(edge);
+    }
+  }
+
+  return outEdges;
+};
 
 export const fileSizeNode = ({
   fromSize,
@@ -219,37 +268,49 @@ export const fileSizeNode = ({
 };
 
 export const expandNode = <T extends { identifier: string }>({
-  queue,
+  roots,
   getReasons: getReasonsFn,
   createNode,
+  limit = 1000,
+  maxDepth = 2,
 }: {
-  queue: T[];
+  roots: T[];
+  limit?: number;
+  maxDepth?: number;
   getReasons(node: T): T[];
-  createNode(node: T): cytoscape.NodeDefinition;
+  createNode(node: T, id: string): cytoscape.NodeDefinition;
 }) => {
+  const queue = roots.map(node => ({ node, depth: 0 }));
   const nodes: cytoscape.NodeDefinition[] = [];
-  const edges: cytoscape.EdgeDefinition[] = [];
-  const sources = new Set<string>();
+  let edges: cytoscape.EdgeDefinition[] = [];
+  const sources = new Set<string>(roots.map(q => q.identifier));
 
   while (queue.length > 0) {
-    const node = queue.pop()!;
-    sources.add(node.identifier);
+    const { node, depth } = queue.pop()!;
+    if (--limit === 0 || depth > maxDepth) {
+      edges = filterUnattachedEdges(nodes, edges);
+      break;
+    }
 
+    const sourceEncoded = Base64.encodeURI(node.identifier);
     for (const found of getReasonsFn(node)) {
+      const foundEncoded = Base64.encodeURI(found.identifier);
+
       if (!sources.has(found.identifier)) {
-        queue.push(found);
+        sources.add(found.identifier);
+        queue.push({ node: found, depth: depth + 1 });
       }
 
       edges.push({
         data: {
-          id: `edge${node.identifier}to${found.identifier}`,
-          source: node.identifier,
-          target: found.identifier,
+          id: `edge${sourceEncoded}to${foundEncoded}`,
+          source: sourceEncoded,
+          target: foundEncoded,
         },
       });
     }
 
-    nodes.push(createNode(node));
+    nodes.push(createNode(node, sourceEncoded));
   }
 
   return { nodes, edges };
@@ -266,30 +327,40 @@ export const expandModuleComparison = (
   const entries: string[] = [];
 
   const { nodes, edges } = expandNode({
-    queue: roots,
+    roots,
     getReasons(node) {
-      let reasons: Stats.Reason[] = [];
+      const output: IWebpackModuleComparisonOutput[] = [];
+
       if (node.old) {
-        reasons = reasons.concat(getReasons(node.old));
+        for (const reason of getReasons(node.old)) {
+          const other = comparisons[normalizeIdentifier(reason.moduleIdentifier)];
+          if (other) {
+            output.push(other);
+          }
+        }
       }
+
       if (node.new) {
-        reasons = reasons.concat(getReasons(node.new));
+        for (const reason of getReasons(node.new)) {
+          const other = comparisons[normalizeIdentifier(reason.moduleIdentifier)];
+          if (other) {
+            output.push(other);
+          }
+
+          if (reason.type && reason.type.includes('entry')) {
+            entries.push(Base64.encodeURI(node.identifier));
+          }
+        }
       }
 
-      if (reasons.some(r => r.type && r.type.includes('entry'))) {
-        entries.push(node.identifier);
-      }
-
-      return reasons
-        .map(r => comparisons[normalizeIdentifier(r.moduleIdentifier || '')])
-        .filter(ok => !!ok);
+      return output;
     },
-    createNode(node) {
+    createNode(node, id) {
       const weight = node.toSize / maxSize;
       const area = Math.max(minBubbleArea, maxBubbleArea * weight);
 
       return fileSizeNode({
-        id: node.identifier,
+        id,
         label: node.name,
         area,
         fromSize: node.fromSize,
