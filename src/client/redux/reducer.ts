@@ -10,7 +10,13 @@ import {
 import { createSelector } from 'reselect';
 import { getType } from 'typesafe-actions';
 import { Stats } from 'webpack';
-import { clearLoadedBundles, CompareAction, doAnalysis, fetchBundlephobiaData } from './actions';
+import {
+  clearLoadedBundles,
+  CompareAction,
+  doAnalysis,
+  fetchBundlephobiaData,
+  loadAllUrls,
+} from './actions';
 import { IBundlephobiaStats } from './services/bundlephobia-api';
 
 /**
@@ -46,6 +52,11 @@ export const reducer = (state = initialState, action: CompareAction): IAppState 
       return {
         ...state,
         bundles: getBundleUrls(state).reduce((acc, url) => ({ ...acc, [url]: idleRetrieval }), {}),
+      };
+    case getType(loadAllUrls):
+      return {
+        ...state,
+        bundles: action.payload.urls.reduce((acc, url) => ({ ...acc, [url]: idleRetrieval }), {}),
       };
     case getType(doAnalysis.request):
       return {

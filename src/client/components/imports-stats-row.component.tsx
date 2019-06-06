@@ -1,10 +1,10 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
 import { Stats } from 'webpack';
+import { DependentModules, TotalNodeModuleSize, UniqueEntrypoints } from './hints/hints.component';
 import { CounterPanel } from './panels/counter-panel.component';
 import { PanelArrangement } from './panels/panel-arrangement.component';
 import { color } from './util';
-import { TotalNodeModuleSize, UniqueEntrypoints, DependentModules } from './hints/hints.component';
 
 /**
  * Prints the list of modules that import the target modules.

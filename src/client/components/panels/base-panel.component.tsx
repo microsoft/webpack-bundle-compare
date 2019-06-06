@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { HintButton } from '../hints/hint-button.component';
 import { classes } from '../util';
 import * as styles from './panels.component.scss';
-import { HintButton } from '../hints/hint-button.component';
 
 export const enum ArrowDirection {
   Up,

@@ -9,12 +9,13 @@ import {
   getTreeShakablePercent,
 } from '../stat-reducers';
 import { ChangedModuleGraph } from './graphs/changed-module-graph.component';
+import { TreeShakeHint } from './hints/hints.component';
 import { ModuleTable } from './module-table.component';
 import { CounterPanel } from './panels/counter-panel.component';
 import { NodeModulePanel } from './panels/node-module-panel.component';
 import { PanelArrangement } from './panels/panel-arrangement.component';
+import { Placeholder } from './placeholder.component';
 import { formatPercent } from './util';
-import { TreeShakeHint } from './hints/hints.component';
 
 export const DashboardChunkPage: React.FC<{
   chunk: number;
@@ -23,6 +24,7 @@ export const DashboardChunkPage: React.FC<{
 }> = ({ first, last, chunk }) => {
   const firstObj = first.chunks!.find(c => c.id === chunk);
   const lastSize = last.chunks!.find(c => c.id === chunk);
+  const nodeModules = compareNodeModules(first, last);
 
   return (
     <>
@@ -68,12 +70,13 @@ export const DashboardChunkPage: React.FC<{
 
           <h2>Node Modules</h2>
           <PanelArrangement>
-            {compareNodeModules(first, last)
+            {nodeModules
               .sort((a, b) => (b.new ? b.new.totalSize : 0) - (a.new ? a.new.totalSize : 0))
               .map(comparison => (
                 <NodeModulePanel comparison={comparison} key={comparison.name} inChunk={chunk} />
               ))}
           </PanelArrangement>
+          {nodeModules.length === 0 && <Placeholder>Huzzah! You have no dependencies!</Placeholder>}
         </div>
         <div className="col-xs-12 col-sm-6">
           <h2>Module List</h2>

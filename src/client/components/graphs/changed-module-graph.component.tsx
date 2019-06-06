@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Redirect } from 'react-router';
 import { Stats } from 'webpack';
 import { compareAllModules } from '../../stat-reducers';
+import { Placeholder } from '../placeholder.component';
 import { BaseGraph, expandModuleComparison } from './base-graph.component';
 
 interface IProps {
@@ -24,7 +25,7 @@ export class ChangedModuleGraph extends React.PureComponent<IProps, IState> {
   public render() {
     return this.state.redirect ? (
       <Redirect to={this.state.redirect} push={true} />
-    ) : (
+    ) : this.state.nodes.length ? (
       <BaseGraph
         edges={this.state.edges}
         nodes={this.state.nodes}
@@ -33,6 +34,8 @@ export class ChangedModuleGraph extends React.PureComponent<IProps, IState> {
         height={window.innerHeight * 0.9}
         onClick={this.onClick}
       />
+    ) : (
+      <Placeholder>No changes made in this bundle.</Placeholder>
     );
   }
 

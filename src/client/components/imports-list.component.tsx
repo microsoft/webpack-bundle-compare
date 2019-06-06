@@ -65,7 +65,9 @@ const ImportReason: React.FC<{ reason: Stats.Reason }> = ({ reason }) => {
       <div className={styles.filename}>{reason.module}</div>
       <div className={styles.fakeLine}>
         <em>{reason.loc.split(':')[0]}</em>
-        {reason.type.includes('harmony') ? `import "${request}"` : `require("${request}")`}
+        {reason.type && reason.type.includes('harmony')
+          ? `import "${request}"`
+          : `require("${request}")`}
       </div>
     </div>
   );

@@ -111,7 +111,8 @@ export const DependentModules: React.FC = () => (
   <>
     <h2>Dependent Modules</h2>
     <p>
-      This is the number of files, in your code or other dependency, that depend on this module. This number lets you easily see if you added or reduced coupling on this dependency.
+      This is the number of files, in your code or other dependency, that depend on this module.
+      This number lets you easily see if you added or reduced coupling on this dependency.
     </p>
   </>
 );

@@ -1,10 +1,10 @@
+import { decode } from 'msgpack-lite';
+import { inflate } from 'pako';
 import { from, Observable } from 'rxjs';
 import { Stats } from 'webpack';
 import { CompareAction, doAnalysis } from '../redux/actions';
 import { ErrorCode } from '../redux/reducer';
 import { Semaphore } from './semaphore';
-import { inflate } from 'pako';
-import { decode } from 'msgpack-lite';
 
 const downloadSemaphore = new Semaphore(1);
 
@@ -26,7 +26,6 @@ export function download(url: string): Observable<CompareAction> {
               },
             });
       } catch (e) {
-        console.log('failed', e.stack);
         return doAnalysis.failure({
           url,
           statusCode: 500,

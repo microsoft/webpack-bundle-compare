@@ -44,7 +44,7 @@ export class BaseGraph extends React.PureComponent<IProps> {
       container,
       boxSelectionEnabled: false,
       autounselectify: true,
-      layout: { name: 'fcose', animate: false } as any,
+      layout: { name: 'fcose', animate: false, nodeSeparation: 150, quality: 'proof' } as any,
       elements: { nodes: this.props.nodes, edges: this.props.edges },
       style: [
         {
@@ -69,7 +69,7 @@ export class BaseGraph extends React.PureComponent<IProps> {
           style: {
             width: 1.5,
             'line-color': '#5c2686',
-            'arrow-scale': 0.5,
+            'arrow-scale': 0.3,
             'source-arrow-color': '#5c2686',
             'source-arrow-shape': 'triangle',
             'curve-style': 'bezier',
@@ -238,7 +238,7 @@ export const expandModuleComparison = (
         reasons = reasons.concat(node.new.reasons as any);
       }
 
-      if (reasons.some(r => r.type.includes('entry'))) {
+      if (reasons.some(r => r.type && r.type.includes('entry'))) {
         entries.push(node.identifier);
       }
 

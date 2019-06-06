@@ -137,8 +137,10 @@ export const getWebpackModules = (stats: Stats.ToJsonOutput, filterToChunk?: num
  */
 export const getImportType = (importedModule: Stats.FnModules) =>
   (importedModule.reasons as any).reduce(
-    (flags: number, reason: { type: string }) =>
-      (flags |= reason.type.includes('cjs')
+    (flags: number, reason: Stats.Reason) =>
+      (flags |= !reason.type
+        ? ImportType.Unknown
+        : reason.type.includes('cjs')
         ? ImportType.CommonJs
         : reason.type.includes('harmony')
         ? ImportType.EsModule

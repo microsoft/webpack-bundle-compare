@@ -8,7 +8,7 @@
     "test": "mocha --opts mocha.opts && npm run test:fmt && npm run test:lint",
     "test:fmt": "prettier --list-different \"src/**/*.{tsx,ts}\" || echo \"Run npm run fmt to fix formatting on these files\"",
     "test:lint": "tslint --project tsconfig.json \"src/**/*.{ts,tsx}\"",
-    "prepare": "tsc",
+    "build": "webpack --config webpack.production.js",
     "start": "webpack-dev-server"
   },
   "repository": {

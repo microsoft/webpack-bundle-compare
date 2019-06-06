@@ -48,7 +48,7 @@ export class ModuleTable extends React.PureComponent<IProps, IState> {
         <Table
           rowHeight={30}
           width={this.state.width}
-          maxHeight={(window.innerHeight * 2) / 3}
+          maxHeight={700}
           headerHeight={40}
           rowsCount={this.state.diffs.length}
           className={styles.plot}

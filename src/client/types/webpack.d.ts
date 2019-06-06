@@ -8,7 +8,7 @@ declare module 'webpack' {
       moduleIdentifier: string;
       module: string;
       moduleName: string;
-      type: string;
+      type: string | null;
       loc: string;
       userRequest: string;
     }

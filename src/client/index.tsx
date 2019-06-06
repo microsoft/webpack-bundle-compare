@@ -31,9 +31,8 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(workerMiddlware, epicMw)),
 );
 worker.onmessage = ev => {
-  console.log('data', ev.data);
   store.dispatch(ev.data);
-}
+};
 
 epicMw.run(epics);
 

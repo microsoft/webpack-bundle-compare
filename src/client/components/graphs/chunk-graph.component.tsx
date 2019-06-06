@@ -30,7 +30,7 @@ export class ChunkGraph extends React.PureComponent<IProps, IState> {
         nodes={this.state.nodes}
         rootNode={this.state.entries}
         width="100%"
-        height={500}
+        height={0.9 * window.innerHeight}
         onClick={this.onClick}
       />
     );
