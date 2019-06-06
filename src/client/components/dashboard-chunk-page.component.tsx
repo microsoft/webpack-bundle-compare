@@ -68,7 +68,10 @@ export const DashboardChunkPage: React.FC<{
             />
           </PanelArrangement>
 
-          <h2>Node Modules</h2>
+          <h2>
+            Node Modules
+            <small>Click on a module to view more information about it.</small>
+          </h2>
           <PanelArrangement>
             {nodeModules
               .sort((a, b) => (b.new ? b.new.totalSize : 0) - (a.new ? a.new.totalSize : 0))

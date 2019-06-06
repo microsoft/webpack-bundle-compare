@@ -33,7 +33,7 @@
 .contents {
   position: relative;
   z-index: 1;
-  max-width: 600px;
+  max-width: 640px;
   margin: 50px;
   padding: 50px;
   border-radius: 4px;
@@ -45,7 +45,11 @@
   }
 
   p {
-    line-height: 1.5em;
+    line-height: 1.7em;
+
+    + p {
+      margin-top: 1em
+    }
   }
 
   h3 {
@@ -54,6 +58,7 @@
 
   li {
     margin-left: 20px;
+    line-height: 1.7em;
 
     + li {
       margin-top: 4px;

@@ -12,6 +12,7 @@ import {
 } from './dashboard-header.component';
 import { DashboardNodeModulePage } from './dashboard-node-module-page.component';
 import { DashboardOverview } from './dashboard-overview';
+import { DashboardOwnModulePage } from './dashboard-own-module-page.component';
 import * as styles from './dashboard.component.scss';
 
 interface IProps {
@@ -49,6 +50,11 @@ class DashboardComponent extends React.PureComponent<IProps> {
           exact
           component={this.renderNodeModule}
         />
+        <Route
+          path="/dashboard/ownmodule/:encodedModule"
+          exact
+          component={this.renderGenericModule}
+        />
       </div>
     );
   }
@@ -73,6 +79,17 @@ class DashboardComponent extends React.PureComponent<IProps> {
   }) =>
     match && (
       <DashboardNodeModulePage
+        name={Base64.decode(match.params.encodedModule)}
+        first={this.first}
+        last={this.last}
+      />
+    );
+
+  private readonly renderGenericModule: React.FC<RouteChildrenProps<{ encodedModule: string }>> = ({
+    match,
+  }) =>
+    match && (
+      <DashboardOwnModulePage
         name={Base64.decode(match.params.encodedModule)}
         first={this.first}
         last={this.last}

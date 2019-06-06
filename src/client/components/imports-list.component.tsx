@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { Stats } from 'webpack';
-import { getImportType, replaceLoaderInIdentifier } from '../stat-reducers';
+import {
+  getConcatenationParent,
+  getImportType,
+  getReasons,
+  replaceLoaderInIdentifier,
+} from '../stat-reducers';
 import * as styles from './imports-list.component.scss';
 import { ModuleTypeBadge } from './panels/node-module-panel.component';
 import { Placeholder } from './placeholder.component';
@@ -13,15 +18,15 @@ export const ImportsList: React.FC<{ targets: Stats.FnModules[] }> = ({ targets 
     <Placeholder>This module is not imported in the lastest build.</Placeholder>
   ) : (
     <>
-      {targets.map(target => (
-        <div key={target.identifier} className={styles.importBox}>
+      {targets.map((target, i) => (
+        <div key={i} className={styles.importBox}>
           <div className={styles.title}>
-            {target.name}
+            {target.name} in chunk {getConcatenationParent(target).chunks.join(', ')}
             <span style={{ flex: 1 }} />
             <ModuleTypeBadge type={getImportType(target)} />
           </div>
-          {(target.reasons as any).map((reason: Stats.Reason, i: number) => (
-            <ImportReason key={i} reason={reason} />
+          {getReasons(target).map((reason, k) => (
+            <ImportReason key={k} reason={reason} />
           ))}
         </div>
       ))}
@@ -37,18 +42,18 @@ export const IssuerTree: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }
   ) : (
     <>
       {targets.map(
-        target =>
+        (target, i) =>
           target.issuerPath && (
-            <div key={target.identifier} className={styles.importBox}>
+            <div key={i} className={styles.importBox}>
               <div className={styles.title}>
-                {target.name}
+                {target.name} in chunk {getConcatenationParent(target).chunks.join(', ')}
                 <span style={{ flex: 1 }} />
                 <ModuleTypeBadge type={getImportType(target)} />
               </div>
               <ol className={styles.issuer}>
-                {target.issuerPath.map((issuer, i) => (
-                  <li key={i}>
-                    <em>{i + 1}.</em> {issuer.name}
+                {target.issuerPath.map((issuer, k) => (
+                  <li key={k}>
+                    <em>{k + 1}.</em> {issuer.name}
                   </li>
                 ))}
               </ol>

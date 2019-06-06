@@ -38,6 +38,27 @@ export const TreeShakeHint: React.FC = () => (
   </>
 );
 
+export const SideEffectHint: React.FC = () => (
+  <>
+    <p>
+      Some code, such as polyfills, has a side-effect on the page when imported. Modules that have
+      side-effects can't be tree-shaken as effectively, because the compiler can usually not 'prove'
+      that doing so is safe.
+    </p>
+    <p>
+      Modules which are side-effect free should be marked as such by adding the{' '}
+      <code>sideEffects: false</code> flag to their <code>package.json</code>. See the{' '}
+      <a
+        href="https://webpack.js.org/guides/tree-shaking#mark-the-file-as-side-effect-free"
+        target="_blank"
+      >
+        Webpack documentation
+      </a>{' '}
+      for more information.
+    </p>
+  </>
+);
+
 export const WhatIsAnEntrypoint: React.FC = () => (
   <>
     <h2>Entrypoints</h2>

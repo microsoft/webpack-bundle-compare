@@ -11,9 +11,11 @@ export const replaceLoaderInIdentifier = (identifier: string) =>
   identifier.replace(loaderRegex, '');
 
 /**
- * Normalizes an identifier so that it carries over time.
+ * Normalizes an identifier so that it carries over time: removing the
+ * hash from the end of concatenated module identifiers.
  */
-export const normalizeIdentifier = (identifier: string) => identifier.replace(/ [a-z0-9]+$/, '');
+export const normalizeIdentifier = (identifier?: string) =>
+  identifier ? identifier.replace(/ [a-z0-9]+$/, '') : '';
 
 /**
  * Normalizes an identifier so that it carries over time.
@@ -88,7 +90,11 @@ export interface INodeModule {
   importType: ImportType;
 }
 
-const getNodeModuleFromIdentifier = (identifier: string): string | null => {
+/**
+ * Tries to get the node module in the given identifier, returning null if
+ * it's not a node module import.
+ */
+export const getNodeModuleFromIdentifier = (identifier: string): string | null => {
   const parts = replaceLoaderInIdentifier(identifier).split(anyPathSeparator);
   for (let i = parts.length - 1; i >= 0; i--) {
     if (parts[i] !== 'node_modules') {
@@ -106,11 +112,20 @@ const getNodeModuleFromIdentifier = (identifier: string): string | null => {
   return null;
 };
 
+const concatParents = new WeakMap<Stats.FnModules, Stats.FnModules>();
+
+/**
+ * Returns the concatenation parent in which the given module resides. Will
+ * returnt he module itself if it's already top-level.
+ */
+export const getConcatenationParent = (m: Stats.FnModules): Stats.FnModules =>
+  concatParents.get(m) || m;
+
 /**
  * Get webpack modules, either globally ro in a single chunk.
  */
-export const getWebpackModules = (stats: Stats.ToJsonOutput, filterToChunk?: number) => {
-  let modules: Stats.FnModules[] = [];
+export const getWebpackModules = cacheByArg((stats: Stats.ToJsonOutput, filterToChunk?: number) => {
+  const modules: Stats.FnModules[] = [];
   if (!stats.modules) {
     return modules;
   }
@@ -122,21 +137,39 @@ export const getWebpackModules = (stats: Stats.ToJsonOutput, filterToChunk?: num
 
     // If it has nested modules, it's a concatened chunk. Remove the
     // concatenation and only emit children.
-    if (parent.modules) {
-      modules = modules.concat(parent.modules);
-    } else {
+    if (!parent.modules) {
       modules.push(parent);
+      continue;
+    }
+
+    for (const child of parent.modules) {
+      modules.push(child);
+      concatParents.set(child, parent);
     }
   }
 
   return modules;
-};
+});
+
+/**
+ * Returns a mapping of normalized identifiers in the chunk to module data.
+ */
+export const getWebpackModulesMap = cacheByArg(
+  (stats: Stats.ToJsonOutput, filterToChunk?: number) => {
+    const mapping: { [identifier: string]: Stats.FnModules } = {};
+    for (const m of getWebpackModules(stats, filterToChunk)) {
+      mapping[normalizeIdentifier(m.identifier)] = m;
+    }
+
+    return mapping;
+  },
+);
 
 /**
  * Gets the type of import of the given module.
  */
 export const getImportType = (importedModule: Stats.FnModules) =>
-  (importedModule.reasons as any).reduce(
+  getReasons(importedModule).reduce(
     (flags: number, reason: Stats.Reason) =>
       (flags |= !reason.type
         ? ImportType.Unknown
@@ -408,16 +441,30 @@ export const getModuleTree = cacheByArg(
 );
 
 /**
- * Module that changed in the build.
+ * Gets the reasons that the module was imported. Fix for broken webpack typings here.
  */
-export interface IModuleDiffEntry {
-  name: string;
-  fromSize: number;
-  toSize: number;
-}
+export const getReasons = (m: Stats.FnModules): Stats.Reason[] => m.reasons as any;
 
 /**
  * Gets all direct imports of the given node module.
  */
 export const getDirectImportsOfNodeModule = (stats: Stats.ToJsonOutput, name: string) =>
   stats.modules!.filter(m => getNodeModuleFromIdentifier(m.name) === name);
+
+/**
+ * Gets all direct imports of the given node module.
+ */
+export const getImportersOfIdentifier = (
+  stats: Stats.ToJsonOutput,
+  identifier: string,
+): Stats.FnModules[] => {
+  const modules = getWebpackModulesMap(stats);
+  const root = modules[normalizeIdentifier(identifier)];
+  if (!root) {
+    return [];
+  }
+
+  return getReasons(root)
+    .map(reason => modules[normalizeIdentifier(reason.moduleIdentifier)])
+    .filter(Boolean);
+};

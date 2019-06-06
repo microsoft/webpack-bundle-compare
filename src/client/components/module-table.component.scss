@@ -30,6 +30,14 @@
     background-color: rgba(#000, 0.1);
   }
 
+  .public_fixedDataTableRow_main {
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(#fff, 0.05);
+    }
+  }
+
   .public_fixedDataTableCell_main {
     background: none;
     border-color: rgba(#000, 0.3);

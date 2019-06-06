@@ -1,9 +1,15 @@
 import * as cytoscape from 'cytoscape';
 import * as filesize from 'filesize';
 import * as React from 'react';
+import { IoIosContract, IoIosExpand } from 'react-icons/io';
 import { Stats } from 'webpack';
-import { IWebpackModuleComparisonOutput, normalizeIdentifier } from '../../stat-reducers';
+import {
+  getReasons,
+  IWebpackModuleComparisonOutput,
+  normalizeIdentifier,
+} from '../../stat-reducers';
 import { formatPercentageDifference } from '../util';
+import * as styles from './base-graph.component.scss';
 
 // tslint:disable-next-line
 cytoscape.use(require('cytoscape-fcose'));
@@ -22,8 +28,20 @@ export class BaseGraph extends React.PureComponent<IProps> {
   private mountTimeout?: number | NodeJS.Timeout;
   private graph?: cytoscape.Core;
 
+  private readonly zoomIn = this.createZoomFn(1);
+  private readonly zoomOut = this.createZoomFn(-1);
+
   public componentDidMount() {
     this.mountTimeout = setTimeout(() => this.draw(this.container.current!), 10);
+  }
+
+  public componentDidUpdate(prevProps: IProps) {
+    if (
+      (prevProps.edges !== this.props.edges || prevProps.nodes !== this.props.nodes) &&
+      this.container.current
+    ) {
+      this.draw(this.container.current);
+    }
   }
 
   public componentWillUnmount() {
@@ -35,8 +53,27 @@ export class BaseGraph extends React.PureComponent<IProps> {
 
   public render() {
     return (
-      <div ref={this.container} style={{ width: this.props.width, height: this.props.height }} />
+      <div className={styles.container}>
+        <div ref={this.container} style={{ width: this.props.width, height: this.props.height }} />
+        <div className={styles.controls}>
+          <button onClick={this.zoomIn}>
+            <IoIosExpand />
+          </button>
+          <button onClick={this.zoomOut}>
+            <IoIosContract />
+          </button>
+        </div>
+      </div>
     );
+  }
+
+  private createZoomFn(multiplier: number) {
+    return (evt: React.MouseEvent) => {
+      if (this.graph) {
+        const nextZoom = this.graph.zoom() + multiplier * (evt.shiftKey ? 10 : 1);
+        this.graph.zoom(Math.max(1, nextZoom));
+      }
+    };
   }
 
   private draw(container: HTMLDivElement) {
@@ -44,6 +81,7 @@ export class BaseGraph extends React.PureComponent<IProps> {
       container,
       boxSelectionEnabled: false,
       autounselectify: true,
+      userZoomingEnabled: false,
       layout: { name: 'fcose', animate: false, nodeSeparation: 150, quality: 'proof' } as any,
       elements: { nodes: this.props.nodes, edges: this.props.edges },
       style: [
@@ -182,7 +220,7 @@ export const fileSizeNode = ({
 
 export const expandNode = <T extends { identifier: string }>({
   queue,
-  getReasons,
+  getReasons: getReasonsFn,
   createNode,
 }: {
   queue: T[];
@@ -197,7 +235,7 @@ export const expandNode = <T extends { identifier: string }>({
     const node = queue.pop()!;
     sources.add(node.identifier);
 
-    for (const found of getReasons(node)) {
+    for (const found of getReasonsFn(node)) {
       if (!sources.has(found.identifier)) {
         queue.push(found);
       }
@@ -232,10 +270,10 @@ export const expandModuleComparison = (
     getReasons(node) {
       let reasons: Stats.Reason[] = [];
       if (node.old) {
-        reasons = reasons.concat(node.old.reasons as any);
+        reasons = reasons.concat(getReasons(node.old));
       }
       if (node.new) {
-        reasons = reasons.concat(node.new.reasons as any);
+        reasons = reasons.concat(getReasons(node.new));
       }
 
       if (reasons.some(r => r.type && r.type.includes('entry'))) {

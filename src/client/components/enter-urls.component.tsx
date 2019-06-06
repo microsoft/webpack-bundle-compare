@@ -56,7 +56,7 @@ class EnterUrlsComponent extends React.PureComponent<IProps, IState> {
         <>
           <small>Opening the dashboard...</small>
           <ProgressBar progress={1} />
-          <Redirect to="/dashboard" />
+          <Redirect to="/dashboard" push={true} />
         </>
       );
     } else {
@@ -72,7 +72,7 @@ class EnterUrlsComponent extends React.PureComponent<IProps, IState> {
             value={this.state.urls}
             onChange={this.onChange}
           />
-          <Button onClick={this.load} disabled={!this.state.urls.includes('\n')}>
+          <Button onClick={this.load} disabled={!this.state.urls.trim()}>
             Load
           </Button>
         </>

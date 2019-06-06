@@ -1,6 +1,7 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
 import { Stats } from 'webpack';
+import { getReasons } from '../stat-reducers';
 import { DependentModules, TotalNodeModuleSize, UniqueEntrypoints } from './hints/hints.component';
 import { CounterPanel } from './panels/counter-panel.component';
 import { PanelArrangement } from './panels/panel-arrangement.component';
@@ -31,8 +32,8 @@ export const ImportsStatsRow: React.FC<{
     <CounterPanel
       title="Dependent Modules"
       hint={DependentModules}
-      value={newTargets.reduce((acc, t) => acc + (t.reasons as any).length, 0)}
-      oldValue={oldTargets.reduce((acc, t) => acc + (t.reasons as any).length, 0)}
+      value={newTargets.reduce((acc, t) => acc + getReasons(t).length, 0)}
+      oldValue={oldTargets.reduce((acc, t) => acc + getReasons(t).length, 0)}
     />
   </PanelArrangement>
 );

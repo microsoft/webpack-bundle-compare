@@ -8,6 +8,7 @@ import { getBundlephobiaData, IAppState } from '../redux/reducer';
 import { IBundlephobiaStats } from '../redux/services/bundlephobia-api';
 import * as styles from './bundlephobia-stats.component.scss';
 import { Errors } from './errors.component';
+import { SideEffectHint, TreeShakeHint } from './hints/hints.component';
 import { BasePanel } from './panels/base-panel.component';
 import { BooleanPanel } from './panels/boolean-panel.component';
 import { CounterPanel } from './panels/counter-panel.component';
@@ -93,10 +94,15 @@ class BundlephobiaStatsComponent extends React.PureComponent<IProps> {
                 <BooleanPanel
                   value={stats.value.hasJSModule || stats.value.hasJSNext}
                   title={'Tree-Shakable'}
+                  hint={TreeShakeHint}
                 />
               </div>
               <div className="col-xs-6">
-                <BooleanPanel value={!stats.value.hasSideEffects} title={'Side-Effect Free'} />
+                <BooleanPanel
+                  value={!stats.value.hasSideEffects}
+                  title={'Side-Effect Free'}
+                  hint={SideEffectHint}
+                />
               </div>
             </div>
             <div className={styles.icons}>

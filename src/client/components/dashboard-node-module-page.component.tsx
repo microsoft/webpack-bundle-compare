@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Stats } from 'webpack';
 import { getDirectImportsOfNodeModule } from '../stat-reducers';
 import { BundlephobiaStats } from './bundlephobia-stats.component';
-import { DependentGraph } from './graphs/dependent-graph.component';
+import { NodeModuleDependentGraph } from './graphs/dependent-graph.component';
 import { ImportsList, IssuerTree } from './imports-list.component';
 import { ImportsStatsRow } from './imports-stats-row.component';
 
@@ -37,7 +37,7 @@ export const DashboardNodeModulePage: React.FC<{
       <h2>
         Import Tree<small>A graph of all files that depend on the module.</small>
       </h2>
-      <DependentGraph previous={first} stats={last} name={name} />
+      <NodeModuleDependentGraph previous={first} stats={last} name={name} />
     </>
   );
 };
