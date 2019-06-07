@@ -148,6 +148,12 @@ export class BaseGraph extends React.PureComponent<IProps, { filter: FilterState
             'source-arrow-color': '#fff',
           },
         },
+        {
+          selector: 'node.highlighted',
+          style: {
+            label: 'data(label)',
+          },
+        },
       ],
     });
 
@@ -248,22 +254,20 @@ export const fileSizeNode = ({
   fromSize: number;
   toSize: number;
   area: number;
-}): cytoscape.NodeDefinition => {
+}): cytoscape.NodeDataDefinition => {
   const hue = fromSize < toSize ? 0 : fromSize > toSize ? 110 : 55;
   const saturation = 40 + Math.min(60, (Math.abs(toSize - fromSize) / (toSize || 1)) * 100);
 
   return {
-    data: {
-      ...options,
-      label: `${options.label} (${filesize(toSize)}), ${formatPercentageDifference(
-        fromSize,
-        toSize,
-      )}`,
-      fontColor: fromSize !== toSize ? '#fff' : '#666',
-      bgColor: fromSize !== toSize ? `hsl(${hue}, ${saturation}%, 50%)` : '#666',
-      width: Math.round(2 * Math.sqrt(area / Math.PI)),
-      height: Math.round(2 * Math.sqrt(area / Math.PI)),
-    },
+    ...options,
+    label: `${options.label} (${filesize(toSize)}), ${formatPercentageDifference(
+      fromSize,
+      toSize,
+    )}`,
+    fontColor: fromSize !== toSize ? '#fff' : '#666',
+    bgColor: fromSize !== toSize ? `hsl(${hue}, ${saturation}%, 50%)` : '#666',
+    width: Math.round(2 * Math.sqrt(area / Math.PI)),
+    height: Math.round(2 * Math.sqrt(area / Math.PI)),
   };
 };
 
@@ -271,24 +275,30 @@ export const expandNode = <T extends { identifier: string }>({
   roots,
   getReasons: getReasonsFn,
   createNode,
+  maxDepth = Infinity,
   limit = 1000,
-  maxDepth = 2,
 }: {
   roots: T[];
   limit?: number;
   maxDepth?: number;
   getReasons(node: T): T[];
-  createNode(node: T, id: string): cytoscape.NodeDefinition;
+  createNode(node: T, id: string): cytoscape.NodeDataDefinition;
 }) => {
   const queue = roots.map(node => ({ node, depth: 0 }));
   const nodes: cytoscape.NodeDefinition[] = [];
-  let edges: cytoscape.EdgeDefinition[] = [];
   const sources = new Set<string>(roots.map(q => q.identifier));
+  const edges: cytoscape.EdgeDefinition[] = [];
+  let needsFiltering = false;
 
   while (queue.length > 0) {
     const { node, depth } = queue.pop()!;
-    if (--limit === 0 || depth > maxDepth) {
-      edges = filterUnattachedEdges(nodes, edges);
+    if (depth > maxDepth) {
+      needsFiltering = true;
+      break;
+    }
+
+    if (--limit === 0) {
+      needsFiltering = true;
       break;
     }
 
@@ -310,10 +320,17 @@ export const expandNode = <T extends { identifier: string }>({
       });
     }
 
-    nodes.push(createNode(node, sourceEncoded));
+    nodes.push({
+      data: {
+        ...createNode(node, sourceEncoded),
+        depth,
+      },
+    });
   }
 
-  return { nodes, edges };
+  nodes.sort((a, b) => a.data.depth - b.data.depth);
+
+  return { nodes, edges: needsFiltering ? filterUnattachedEdges(nodes, edges) : edges };
 };
 
 export const expandModuleComparison = (
@@ -331,17 +348,12 @@ export const expandModuleComparison = (
     getReasons(node) {
       const output: IWebpackModuleComparisonOutput[] = [];
 
-      if (node.old) {
-        for (const reason of getReasons(node.old)) {
-          const other = comparisons[normalizeIdentifier(reason.moduleIdentifier)];
-          if (other) {
-            output.push(other);
-          }
+      for (const fnModule of [node.old, node.new]) {
+        if (!fnModule) {
+          continue;
         }
-      }
 
-      if (node.new) {
-        for (const reason of getReasons(node.new)) {
+        for (const reason of getReasons(fnModule)) {
           const other = comparisons[normalizeIdentifier(reason.moduleIdentifier)];
           if (other) {
             output.push(other);

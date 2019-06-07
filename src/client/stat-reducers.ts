@@ -1,15 +1,19 @@
 import { Stats } from 'webpack';
 
-const loaderRegex = /.*!/;
 const anyPathSeparator = /\/|\\/;
 
 /**
  * Replaces the loader path in an identifier.
  * '(<loader expression>!)?/path/to/module.js'
  */
-export const replaceLoaderInIdentifier = (identifier?: string) =>
-  identifier ? identifier.replace(loaderRegex, '') : '';
+export const replaceLoaderInIdentifier = (identifier?: string) => {
+  if (!identifier) {
+    return '';
+  }
 
+  const index = identifier.lastIndexOf('!');
+  return index === -1 ? identifier : identifier.slice(index + 1);
+};
 /**
  * Normalizes an identifier so that it carries over time: removing the
  * hash from the end of concatenated module identifiers.
@@ -26,19 +30,28 @@ const humanReadableIdentifier = (identifier: string) =>
 // tslint:disable-next-line
 const cacheByArg = <T extends Function>(fn: T): T => {
   const cacheMap = new WeakMap<any, any>();
-  return function(this: any, arg1: any, arg2: any) {
-    let valueMap = cacheMap.get(arg1);
-    if (!valueMap) {
-      valueMap = arg2 && typeof arg2 === 'object' ? new WeakMap<any, any>() : new Map<any, any>();
+  const argCount = fn.length;
+  return function(this: any) {
+    let mapping: Map<any, any> | WeakMap<any, any> = cacheMap;
+    for (let i = 0; i < argCount - 1; i++) {
+      const next = arguments[i];
+      if (mapping.has(next)) {
+        mapping = mapping.get(next);
+      } else {
+        const newMap = new Map();
+        mapping.set(next, newMap);
+        mapping = newMap;
+      }
     }
 
-    if (!valueMap.has(arg2)) {
+    const lastArg = arguments[argCount - 1];
+    if (!mapping.has(lastArg)) {
       const value = fn.apply(this, arguments);
-      valueMap.set(arg2, value);
+      mapping.set(lastArg, value);
       return value;
     }
 
-    return valueMap.get(arg2);
+    return mapping.get(lastArg);
   } as any;
 };
 
@@ -168,18 +181,20 @@ export const getWebpackModulesMap = cacheByArg(
 /**
  * Gets the type of import of the given module.
  */
-export const getImportType = (importedModule: Stats.FnModules) =>
-  getReasons(importedModule).reduce(
-    (flags: number, reason: Stats.Reason) =>
-      (flags |= !reason.type
-        ? ImportType.Unknown
-        : reason.type.includes('cjs')
+export const getImportType = (importedModule: Stats.FnModules) => {
+  let flags = 0;
+  for (const reason of getReasons(importedModule)) {
+    if (reason.type) {
+      flags |= reason.type.includes('cjs')
         ? ImportType.CommonJs
         : reason.type.includes('harmony')
         ? ImportType.EsModule
-        : ImportType.Unknown),
-    0,
-  );
+        : ImportType.Unknown;
+    }
+  }
+
+  return flags;
+};
 
 /**
  * Returns the number of dependencies.
@@ -343,9 +358,15 @@ export const compareNodeModules = (
 /**
  * Gets the number of node modules.
  */
-export const getNodeModuleSize = cacheByArg((stats: Stats.ToJsonOutput, inChunk?: number) =>
-  Object.values(getNodeModules(stats, inChunk)).reduce((acc, m) => m.totalSize + acc, 0),
-);
+export const getNodeModuleSize = cacheByArg((stats: Stats.ToJsonOutput, inChunk?: number) => {
+  let total = 0;
+  const modules = getNodeModules(stats, inChunk);
+  for (const key of Object.keys(modules)) {
+    total += modules[key].totalSize;
+  }
+
+  return total;
+});
 
 /**
  * Gets the number of node modules.
@@ -381,8 +402,14 @@ export const getTotalModuleCount = (stats: Stats.ToJsonOutput, inChunk?: number)
 /**
  * Gets the number of node modules.
  */
-export const getAverageChunkSize = (stats: Stats.ToJsonOutput) =>
-  stats.chunks!.reduce((acc, c) => acc + c.size / stats.chunks!.length, 0);
+export const getAverageChunkSize = (stats: Stats.ToJsonOutput) => {
+  let sum = 0;
+  for (const chunk of stats.chunks!) {
+    sum += chunk.size;
+  }
+
+  return sum / stats.chunks!.length;
+};
 
 export interface IModuleTreeNode {
   /**
@@ -405,40 +432,6 @@ export interface IModuleTreeNode {
    */
   children: IModuleTreeNode[];
 }
-
-export const getModuleTree = cacheByArg(
-  (stats: Stats.ToJsonOutput): IModuleTreeNode => {
-    const modules = getWebpackModules(stats);
-    const building: IModuleTreeNode[] = modules.map(m => ({
-      id: Number(m.id),
-      name: m.name,
-      size: m.size,
-      children: [],
-    }));
-
-    const entries: IModuleTreeNode[] = [];
-    for (const item of modules) {
-      const self = building[Number(item.id)];
-      const { reasons } = item as any;
-      if (reasons.some((r: any) => r.type === 'single entry')) {
-        entries.push(self);
-      }
-
-      for (const issuer of reasons) {
-        if (issuer.moduleId !== null && !building[issuer.moduleId].children.includes(self)) {
-          building[issuer.moduleId].children.push(self);
-        }
-      }
-    }
-
-    return {
-      id: -1,
-      name: 'compilation',
-      size: entries.reduce((acc, e) => acc + e.size, 0),
-      children: entries,
-    };
-  },
-);
 
 /**
  * Gets the reasons that the module was imported. Fix for broken webpack typings here.

@@ -6,6 +6,7 @@ import {
   getReasons,
   replaceLoaderInIdentifier,
 } from '../stat-reducers';
+import { ButWaitTheresMore } from './but-wait-theres-more.component';
 import * as styles from './imports-list.component.scss';
 import { ModuleTypeBadge } from './panels/node-module-panel.component';
 import { Placeholder } from './placeholder.component';
@@ -17,20 +18,24 @@ export const ImportsList: React.FC<{ targets: Stats.FnModules[] }> = ({ targets 
   targets.length === 0 ? (
     <Placeholder>This module is not imported in the lastest build.</Placeholder>
   ) : (
-    <>
-      {targets.map((target, i) => (
-        <div key={i} className={styles.importBox}>
-          <div className={styles.title}>
-            {target.name} in chunk {getConcatenationParent(target).chunks.join(', ')}
-            <span style={{ flex: 1 }} />
-            <ModuleTypeBadge type={getImportType(target)} />
+    <ButWaitTheresMore count={targets.length}>
+      {i => {
+        const target = targets[i];
+        const reasons = getReasons(target);
+        return (
+          <div key={i} className={styles.importBox}>
+            <div className={styles.title}>
+              {target.name} in chunk {getConcatenationParent(target).chunks.join(', ')}
+              <span style={{ flex: 1 }} />
+              <ModuleTypeBadge type={getImportType(target)} />
+            </div>
+            <ButWaitTheresMore count={reasons.length}>
+              {k => <ImportReason key={k} reason={reasons[k]} />}
+            </ButWaitTheresMore>
           </div>
-          {getReasons(target).map((reason, k) => (
-            <ImportReason key={k} reason={reason} />
-          ))}
-        </div>
-      ))}
-    </>
+        );
+      }}
+    </ButWaitTheresMore>
   );
 
 /**
@@ -40,9 +45,10 @@ export const IssuerTree: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }
   targets.length === 0 ? (
     <Placeholder>This module is not imported in the lastest build.</Placeholder>
   ) : (
-    <>
-      {targets.map(
-        (target, i) =>
+    <ButWaitTheresMore count={targets.length}>
+      {i => {
+        const target = targets[i];
+        return (
           target.issuerPath && (
             <div key={i} className={styles.importBox}>
               <div className={styles.title}>
@@ -58,9 +64,10 @@ export const IssuerTree: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }
                 ))}
               </ol>
             </div>
-          ),
-      )}
-    </>
+          )
+        );
+      }}
+    </ButWaitTheresMore>
   );
 
 const ImportReason: React.FC<{ reason: Stats.Reason }> = ({ reason }) => {

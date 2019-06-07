@@ -49,15 +49,17 @@ export const ChunkGraph = withRouter(
         const area = Math.max(minBubbleArea, maxBubbleArea * weight);
         const previous = this.props.previous.chunks!.find(c => c.id === chunk.id);
 
-        return fileSizeNode({
-          id: String(chunk.id),
-          chunkId: chunk.id,
-          shortLabel: '' + chunk.id,
-          label: `Chunk ${chunk.id}`,
-          fromSize: previous ? previous.size : 0,
-          toSize: chunk.size,
-          area,
-        });
+        return {
+          data: fileSizeNode({
+            id: String(chunk.id),
+            chunkId: chunk.id,
+            shortLabel: '' + chunk.id,
+            label: `Chunk ${chunk.id}`,
+            fromSize: previous ? previous.size : 0,
+            toSize: chunk.size,
+            area,
+          }),
+        };
       });
 
       const edges: cytoscape.EdgeDefinition[] = [];
