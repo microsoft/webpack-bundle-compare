@@ -1,8 +1,10 @@
 {
-  "extends": "./tsconfig.cli.json",
+  "extends": "./tsconfig.package.json",
   "compilerOptions": {
     "module": "esnext",
     "jsx": "react",
     "lib": ["es6", "es7", "dom", "webworker"],
-  }
+  },
+  "include": ["src"],
+  "exclude": []
 }

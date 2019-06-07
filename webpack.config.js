@@ -52,7 +52,7 @@ module.exports = {
     new DefinePlugin({
       INITIAL_FILES: process.env.WBC_FILES
         ? JSON.stringify(process.env.WBC_FILES.split(','))
-        : '[]',
+        : JSON.stringify(['public/samples/spectrum1.msg.gz', 'public/samples/spectrum2.msg.gz']),
     }),
   ],
   devServer: {

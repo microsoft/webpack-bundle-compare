@@ -2,14 +2,15 @@
   "name": "@mixer/webpack-bundle-compare",
   "version": "0.1.0",
   "description": "Tool to compare webpack bundle files",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "fmt": "prettier --write \"src/**/*.{tsx,ts}\" && npm run test:lint -- --fix",
     "test": "mocha --opts mocha.opts && npm run test:fmt && npm run test:lint",
     "test:fmt": "prettier --list-different \"src/**/*.{tsx,ts}\" || echo \"Run npm run fmt to fix formatting on these files\"",
     "test:lint": "tslint --project tsconfig.json \"src/**/*.{ts,tsx}\"",
     "build": "webpack --config webpack.production.js",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "prepare": "tsc -p tsconfig.package.json"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,11 @@
     "url": "https://github.com/mixer/webpack-bundle-compare/issues"
   },
   "homepage": "https://github.com/mixer/webpack-bundle-compare#readme",
+  "dependencies": {
+    "bfj": "^6.1.1",
+    "js-base64": "^2.5.1",
+    "msgpack-lite": "^0.1.26"
+  },
   "devDependencies": {
     "@mixer/retrieval": "^2.0.2",
     "@types/chai": "^4.1.7",
@@ -58,9 +64,7 @@
     "flexboxgrid": "^6.3.1",
     "fs-extra": "^8.0.1",
     "html-webpack-plugin": "^3.2.0",
-    "js-base64": "^2.5.1",
     "mocha": "^6.1.4",
-    "msgpack-lite": "^0.1.26",
     "node-sass": "^4.12.0",
     "normalize.css": "^8.0.1",
     "pako": "^1.0.10",

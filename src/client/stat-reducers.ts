@@ -14,6 +14,7 @@ export const replaceLoaderInIdentifier = (identifier?: string) => {
   const index = identifier.lastIndexOf('!');
   return index === -1 ? identifier : identifier.slice(index + 1);
 };
+
 /**
  * Normalizes an identifier so that it carries over time: removing the
  * hash from the end of concatenated module identifiers.
@@ -22,11 +23,14 @@ export const normalizeIdentifier = (identifier?: string) =>
   identifier ? identifier.replace(/ [a-z0-9]+$/, '') : '';
 
 /**
- * Normalizes an identifier so that it carries over time.
+ * Higher-order function that caches input to the wrapped function by argument.
+ * It's expected that the first argument to the function is a reference type,
+ * and that the function is not variadic.
+ *
+ * This works pretty simply and gracefully. JavaScript gives us the number of
+ * arguments a given function takes. We use a WeakMap on the first argument,
+ * and then store recursive maps for each subsequent argument.
  */
-const humanReadableIdentifier = (identifier: string) =>
-  replaceLoaderInIdentifier(identifier).replace(/ [a-z0-9]+$/, '');
-
 // tslint:disable-next-line
 const cacheByArg = <T extends Function>(fn: T): T => {
   const cacheMap = new WeakMap<any, any>();
@@ -261,7 +265,6 @@ export const identifyModuleType = (id: string): ModuleType => {
  */
 export interface IWebpackModuleComparisonOutput {
   identifier: string;
-  readableId: string;
   name: string;
   type: ModuleType;
   fromSize: number;
@@ -287,7 +290,6 @@ export const compareAllModules = (
     const normalized = normalizeIdentifier(m.identifier);
     output[normalized] = {
       identifier: normalized,
-      readableId: humanReadableIdentifier(m.identifier),
       name: replaceLoaderInIdentifier(m.name),
       type: identifyModuleType(m.identifier),
       nodeModule: getNodeModuleFromIdentifier(m.identifier) || undefined,
@@ -305,7 +307,6 @@ export const compareAllModules = (
     } else {
       output[normalized] = {
         identifier: normalized,
-        readableId: humanReadableIdentifier(m.identifier),
         name: replaceLoaderInIdentifier(m.name),
         type: identifyModuleType(m.identifier),
         nodeModule: getNodeModuleFromIdentifier(m.identifier) || undefined,
