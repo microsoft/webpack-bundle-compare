@@ -6,7 +6,7 @@ import { Stats } from 'webpack';
 import { compareAllModules, getNodeModuleFromIdentifier } from '../../stat-reducers';
 import { Placeholder } from '../placeholder.component';
 import { linkToModule, linkToNodeModule } from '../util';
-import { BaseGraph, expandModuleComparison } from './base-graph.component';
+import { expandModuleComparison, LazyBaseGraph } from './graph-tool';
 
 interface IProps {
   previous: Stats.ToJsonOutput;
@@ -26,7 +26,7 @@ export const ChangedModuleGraph = withRouter(
 
     public render() {
       return this.state.nodes.length ? (
-        <BaseGraph
+        <LazyBaseGraph
           edges={this.state.edges}
           nodes={this.state.nodes}
           rootNode={this.state.entries}

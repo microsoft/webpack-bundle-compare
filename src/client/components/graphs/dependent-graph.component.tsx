@@ -12,7 +12,7 @@ import {
   replaceLoaderInIdentifier,
 } from '../../stat-reducers';
 import { color, linkToModule, linkToNodeModule } from '../util';
-import { BaseGraph, expandModuleComparison } from './base-graph.component';
+import { expandModuleComparison, LazyBaseGraph } from './graph-tool';
 
 interface IProps {
   previous: Stats.ToJsonOutput;
@@ -51,7 +51,7 @@ const createDependentGraph = <P extends {}>(
 
       public render() {
         return (
-          <BaseGraph
+          <LazyBaseGraph
             edges={this.state.edges}
             nodes={this.state.nodes}
             rootNode={this.state.entries}

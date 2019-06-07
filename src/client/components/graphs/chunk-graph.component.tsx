@@ -2,7 +2,7 @@ import * as cytoscape from 'cytoscape';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { Stats } from 'webpack';
-import { BaseGraph, fileSizeNode } from './base-graph.component';
+import { fileSizeNode, LazyBaseGraph } from './graph-tool';
 
 interface IProps {
   previous: Stats.ToJsonOutput;
@@ -23,7 +23,7 @@ export const ChunkGraph = withRouter(
 
     public render() {
       return (
-        <BaseGraph
+        <LazyBaseGraph
           edges={this.state.edges}
           nodes={this.state.nodes}
           rootNode={this.state.entries}

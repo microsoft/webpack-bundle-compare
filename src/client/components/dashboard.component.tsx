@@ -97,6 +97,6 @@ class DashboardComponent extends React.PureComponent<IProps> {
     );
 }
 
-export const Dashboard = connect((state: IAppState) => ({
+export default connect((state: IAppState) => ({
   stats: getKnownStats(state),
 }))(DashboardComponent);

@@ -1,5 +1,6 @@
 import { IRetrievalError, RetrievalState } from '@mixer/retrieval';
 import * as React from 'react';
+import GithubCorner from 'react-github-corner';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { clearLoadedBundles, loadAllUrls } from '../redux/actions';
@@ -80,10 +81,13 @@ class EnterUrlsComponent extends React.PureComponent<IProps, IState> {
     }
 
     return (
-      <div className={styles.entry}>
-        <h1>Webpack Bundle Comparsion</h1>
-        {contents}
-      </div>
+      <>
+        <GithubCorner href="https://github.com/mixer/webpack-bundle-compare" />
+        <div className={styles.entry}>
+          <h1>Webpack Bundle Comparsion</h1>
+          {contents}
+        </div>
+      </>
     );
   }
 

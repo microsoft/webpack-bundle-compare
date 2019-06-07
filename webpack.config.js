@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const { DefinePlugin } = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
+const { BundleComparisonPlugin } = require('./');
 
 module.exports = {
   mode: 'development',
@@ -45,6 +46,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new BundleComparisonPlugin(),
     new HtmlWebpackPlugin({
       title: 'Webpack Bundle Compare',
     }),
@@ -52,7 +54,7 @@ module.exports = {
     new DefinePlugin({
       INITIAL_FILES: process.env.WBC_FILES
         ? JSON.stringify(process.env.WBC_FILES.split(','))
-        : JSON.stringify(['public/samples/spectrum1.msg.gz', 'public/samples/spectrum2.msg.gz']),
+        : JSON.stringify(['public/samples/spectrum1.msp.gz', 'public/samples/spectrum2.msp.gz']),
     }),
   ],
   devServer: {
