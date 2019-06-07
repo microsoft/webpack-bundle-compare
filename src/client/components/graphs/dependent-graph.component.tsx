@@ -6,9 +6,9 @@ import { Stats } from 'webpack';
 import {
   compareAllModules,
   getDirectImportsOfNodeModule,
-  getImportersOfIdentifier,
+  getImportsOfName,
   getNodeModuleFromIdentifier,
-  normalizeIdentifier,
+  normalizeName,
   replaceLoaderInIdentifier,
 } from '../../stat-reducers';
 import { color, linkToModule, linkToNodeModule } from '../util';
@@ -72,9 +72,7 @@ const createDependentGraph = <P extends {}>(
 
         const { nodes, edges } = expandModuleComparison(
           comparisons,
-          directImports
-            .map(imp => comparisons[normalizeIdentifier(imp.identifier)])
-            .filter(ok => !!ok),
+          directImports.map(imp => comparisons[normalizeName(imp.name)]).filter(ok => !!ok),
         );
 
         for (const edge of edges) {
@@ -93,7 +91,7 @@ const createDependentGraph = <P extends {}>(
         });
 
         for (const direct of directImports) {
-          const directId = Base64.encodeURI(normalizeIdentifier(direct.identifier));
+          const directId = Base64.encodeURI(direct.name);
           edges.push({
             data: {
               id: `${directId}toIndex`,
@@ -126,6 +124,6 @@ export const NodeModuleDependentGraph = createDependentGraph<{ name: string }>(
  * Graphs the dependent tree for a node module.
  */
 export const GenericDependentGraph = createDependentGraph<{ root: Stats.FnModules }>(
-  props => getImportersOfIdentifier(props.stats, props.root.identifier),
+  props => getImportsOfName(props.stats, props.root.name),
   props => replaceLoaderInIdentifier(props.root.name),
 );

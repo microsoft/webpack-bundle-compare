@@ -5,7 +5,8 @@ import * as React from 'react';
 import {
   getReasons,
   IWebpackModuleComparisonOutput,
-  normalizeIdentifier,
+  normalizeName,
+  replaceLoaderInIdentifier,
 } from '../../stat-reducers';
 import { IndefiniteProgressBar } from '../progress-bar.component';
 import { formatPercentageDifference } from '../util';
@@ -56,7 +57,7 @@ export const fileSizeNode = ({
   };
 };
 
-export const expandNode = <T extends { identifier: string }>({
+export const expandNode = <T extends { name: string }>({
   roots,
   getReasons: getReasonsFn,
   createNode,
@@ -71,7 +72,7 @@ export const expandNode = <T extends { identifier: string }>({
 }) => {
   const queue = roots.map(node => ({ node, depth: 0 }));
   const nodes: cytoscape.NodeDefinition[] = [];
-  const sources = new Set<string>(roots.map(q => q.identifier));
+  const sources = new Set<string>(roots.map(q => q.name));
   const edges: cytoscape.EdgeDefinition[] = [];
   let needsFiltering = false;
 
@@ -87,12 +88,12 @@ export const expandNode = <T extends { identifier: string }>({
       break;
     }
 
-    const sourceEncoded = Base64.encodeURI(node.identifier);
+    const sourceEncoded = Base64.encodeURI(node.name);
     for (const found of getReasonsFn(node)) {
-      const foundEncoded = Base64.encodeURI(found.identifier);
+      const foundEncoded = Base64.encodeURI(found.name);
 
-      if (!sources.has(found.identifier)) {
-        sources.add(found.identifier);
+      if (!sources.has(found.name)) {
+        sources.add(found.name);
         queue.push({ node: found, depth: depth + 1 });
       }
 
@@ -139,13 +140,13 @@ export const expandModuleComparison = (
         }
 
         for (const reason of getReasons(fnModule)) {
-          const other = comparisons[normalizeIdentifier(reason.moduleIdentifier)];
+          const other = comparisons[normalizeName(reason.name || reason.moduleName)];
           if (other) {
             output.push(other);
           }
 
           if (reason.type && reason.type.includes('entry')) {
-            entries.push(Base64.encodeURI(node.identifier));
+            entries.push(Base64.encodeURI(node.name));
           }
         }
       }
@@ -158,7 +159,7 @@ export const expandModuleComparison = (
 
       return fileSizeNode({
         id,
-        label: node.name,
+        label: replaceLoaderInIdentifier(node.name),
         area,
         fromSize: node.fromSize,
         toSize: node.toSize,

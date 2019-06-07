@@ -17,10 +17,10 @@ export const replaceLoaderInIdentifier = (identifier?: string) => {
 
 /**
  * Normalizes an identifier so that it carries over time: removing the
- * hash from the end of concatenated module identifiers.
+ *  "+ X modules" from the end of concatenated module identifiers.
  */
-export const normalizeIdentifier = (identifier?: string) =>
-  identifier ? identifier.replace(/ [a-z0-9]+$/, '') : '';
+export const normalizeName = (identifier?: string) =>
+  identifier ? identifier.replace(/ \+ [0-9]+ modules$/, '') : '';
 
 /**
  * Higher-order function that caches input to the wrapped function by argument.
@@ -173,9 +173,9 @@ export const getWebpackModules = cacheByArg((stats: Stats.ToJsonOutput, filterTo
  */
 export const getWebpackModulesMap = cacheByArg(
   (stats: Stats.ToJsonOutput, filterToChunk?: number) => {
-    const mapping: { [identifier: string]: Stats.FnModules } = {};
+    const mapping: { [name: string]: Stats.FnModules } = {};
     for (const m of getWebpackModules(stats, filterToChunk)) {
-      mapping[normalizeIdentifier(m.identifier)] = m;
+      mapping[normalizeName(m.name)] = m;
     }
 
     return mapping;
@@ -264,7 +264,6 @@ export const identifyModuleType = (id: string): ModuleType => {
  * Grouped output comparing an old and new node module.
  */
 export interface IWebpackModuleComparisonOutput {
-  identifier: string;
   name: string;
   type: ModuleType;
   fromSize: number;
@@ -287,10 +286,9 @@ export const compareAllModules = (
 
   const output: { [name: string]: IWebpackModuleComparisonOutput } = {};
   for (const m of oldModules) {
-    const normalized = normalizeIdentifier(m.identifier);
+    const normalized = normalizeName(m.name);
     output[normalized] = {
-      identifier: normalized,
-      name: replaceLoaderInIdentifier(m.name),
+      name: normalized,
       type: identifyModuleType(m.identifier),
       nodeModule: getNodeModuleFromIdentifier(m.identifier) || undefined,
       toSize: 0,
@@ -300,14 +298,13 @@ export const compareAllModules = (
   }
 
   for (const m of newModules) {
-    const normalized = normalizeIdentifier(m.identifier);
+    const normalized = normalizeName(m.name);
     if (output[normalized]) {
       output[normalized].new = m;
       output[normalized].toSize = m.size;
     } else {
       output[normalized] = {
-        identifier: normalized,
-        name: replaceLoaderInIdentifier(m.name),
+        name: normalized,
         type: identifyModuleType(m.identifier),
         nodeModule: getNodeModuleFromIdentifier(m.identifier) || undefined,
         fromSize: 0,
@@ -448,17 +445,14 @@ export const getDirectImportsOfNodeModule = (stats: Stats.ToJsonOutput, name: st
 /**
  * Gets all direct imports of the given node module.
  */
-export const getImportersOfIdentifier = (
-  stats: Stats.ToJsonOutput,
-  identifier: string,
-): Stats.FnModules[] => {
+export const getImportsOfName = (stats: Stats.ToJsonOutput, name: string): Stats.FnModules[] => {
   const modules = getWebpackModulesMap(stats);
-  const root = modules[normalizeIdentifier(identifier)];
+  const root = modules[name];
   if (!root) {
     return [];
   }
 
   return getReasons(root)
-    .map(reason => modules[normalizeIdentifier(reason.moduleIdentifier)])
+    .map(reason => modules[reason.moduleName])
     .filter(Boolean);
 };

@@ -2,9 +2,8 @@ import * as filesize from 'filesize';
 import * as React from 'react';
 import { Stats } from 'webpack';
 import {
-  getImportersOfIdentifier,
+  getImportsOfName,
   getWebpackModulesMap,
-  normalizeIdentifier,
   replaceLoaderInIdentifier,
 } from '../stat-reducers';
 import { GenericDependentGraph } from './graphs/dependent-graph.component';
@@ -18,16 +17,15 @@ export const DashboardOwnModulePage: React.FC<{
   first: Stats.ToJsonOutput;
   last: Stats.ToJsonOutput;
 }> = ({ first, last, name }) => {
-  const normalized = normalizeIdentifier(name);
-  const firstRoot = getWebpackModulesMap(first)[normalized];
-  const lastRoot = getWebpackModulesMap(last)[normalized];
+  const firstRoot = getWebpackModulesMap(first)[name];
+  const lastRoot = getWebpackModulesMap(last)[name];
   const anyRoot = lastRoot || firstRoot;
   if (!anyRoot) {
     return null;
   }
 
-  const firstImports = getImportersOfIdentifier(first, normalized);
-  const lastImports = getImportersOfIdentifier(last, normalized);
+  const firstImports = getImportsOfName(first, name);
+  const lastImports = getImportsOfName(last, name);
 
   return (
     <>

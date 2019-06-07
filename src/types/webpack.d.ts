@@ -7,6 +7,7 @@ declare module 'webpack' {
       moduleId: number;
       moduleIdentifier: string;
       module: string;
+      name?: string;
       moduleName: string;
       type: string | null;
       loc: string;

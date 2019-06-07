@@ -6,6 +6,7 @@ import {
   compareAllModules,
   getNodeModuleFromIdentifier,
   IWebpackModuleComparisonOutput,
+  replaceLoaderInIdentifier,
 } from '../stat-reducers';
 import * as styles from './module-table.component.scss';
 
@@ -124,7 +125,7 @@ export const ModuleTable = withRouter(
 
     private readonly nameCell = (props: ColumnCellProps) => {
       const { rowIndex, ...rest } = props;
-      return <Cell {...rest}>{this.state.diffs[rowIndex].name}</Cell>;
+      return <Cell {...rest}>{replaceLoaderInIdentifier(this.state.diffs[rowIndex].name)}</Cell>;
     };
 
     private readonly totalSizeCell = (props: ColumnCellProps) => {
@@ -146,10 +147,8 @@ export const ModuleTable = withRouter(
 
     private readonly onRowClick = (_: React.SyntheticEvent<Table>, rowIndex: number) => {
       const row = this.state.diffs[rowIndex];
-      const nodeModule = getNodeModuleFromIdentifier(row.identifier);
-      this.props.history.push(
-        nodeModule ? linkToNodeModule(nodeModule) : linkToModule(row.identifier),
-      );
+      const nodeModule = getNodeModuleFromIdentifier(row.name);
+      this.props.history.push(nodeModule ? linkToNodeModule(nodeModule) : linkToModule(row.name));
     };
 
     private orderDiff(
