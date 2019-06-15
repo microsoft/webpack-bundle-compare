@@ -135,7 +135,6 @@ export const getKnownStats = createSelector(
       }
     }
 
-    output.sort((a, b) => (a.builtAt || 0) - (b.builtAt || 0));
     return output;
   },
 );
