@@ -6,7 +6,7 @@ This is a tool that allows you to compare webpack bundle analysis files over tim
 
 ## Usage
 
-The bundle comparison tool takes URLs of webpack stat outputs and displays them. You can use the JSON output from the [webpack-bundle-analyzer](github.com/webpack-contrib/webpack-bundle-analyzer), but we also include a plugin here if you don't use that package.
+The bundle comparison tool takes URLs of webpack stat outputs and displays them. You can use the JSON output from the [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer), but we also include a plugin here if you don't use that package.
 
 ### Using the Plugin
 
