@@ -49,12 +49,15 @@ export const ChunkGraph = withRouter(
         const area = Math.max(minBubbleArea, maxBubbleArea * weight);
         const previous = this.props.previous.chunks!.find(c => c.id === chunk.id);
 
+        // If the chunk has a friendly name, render that in the chart. Otherwise, list the chunk id.
+        const chunkLabel = chunk.names.length > 0 ? chunk.names[0] : `Chunk ${chunk.id}`
+
         return {
           data: fileSizeNode({
             id: String(chunk.id),
             chunkId: chunk.id,
             shortLabel: '' + chunk.id,
-            label: `Chunk ${chunk.id}`,
+            label: chunkLabel,
             fromSize: previous ? previous.size : 0,
             toSize: chunk.size,
             area,
