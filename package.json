@@ -9,7 +9,7 @@
     "test:fmt": "prettier --list-different \"src/**/*.{tsx,ts}\" || echo \"Run npm run fmt to fix formatting on these files\"",
     "test:lint": "tslint --project tsconfig.json \"src/**/*.{ts,tsx}\"",
     "build": "webpack --config webpack.production.js",
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --open",
     "prepare": "tsc -p tsconfig.package.json"
   },
   "repository": {
