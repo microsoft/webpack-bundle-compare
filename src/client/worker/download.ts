@@ -2,32 +2,43 @@ import { decode } from 'msgpack-lite';
 import { inflate } from 'pako';
 import { from, Observable } from 'rxjs';
 import { Stats } from 'webpack';
-import { CompareAction, doAnalysis } from '../redux/actions';
+import { CompareAction, doAnalysis, ILoadableResource } from '../redux/actions';
 import { ErrorCode } from '../redux/reducer';
 import { Semaphore } from './semaphore';
 
 const downloadSemaphore = new Semaphore(1);
 
-export function download(url: string): Observable<CompareAction> {
+export function download(resource: ILoadableResource): Observable<CompareAction> {
   return from(
     (async () => {
       await downloadSemaphore.acquire().toPromise();
 
       try {
-        const res = await fetch(url);
-        return res.ok
-          ? doAnalysis.success({ url, data: processDownload(await res.arrayBuffer()) })
-          : doAnalysis.failure({
-              url,
+        let buffer: ArrayBuffer;
+
+        if (resource.file) {
+          const reader = new FileReaderSync();
+          buffer = reader.readAsArrayBuffer(resource.file);
+        } else {
+          const res = await fetch(resource.url);
+          if (!res.ok) {
+            return doAnalysis.failure({
+              resource,
               statusCode: res.status,
               serviceError: {
                 errorCode: ErrorCode.BundleRetrievalFailed,
                 errorMessage: `Unexpected ${res.status} response: ${await res.text()}`,
               },
             });
+          }
+
+          buffer = await res.arrayBuffer();
+        }
+
+        return doAnalysis.success({ resource, data: processDownload(buffer) });
       } catch (e) {
         return doAnalysis.failure({
-          url,
+          resource,
           statusCode: 500,
           serviceError: {
             errorCode: ErrorCode.BundleRetrievalFailed,

@@ -44,3 +44,4 @@ jspm_packages
 
 /public/samples
 /dist
+/.vscode
