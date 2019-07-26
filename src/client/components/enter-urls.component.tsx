@@ -3,7 +3,7 @@ import * as React from 'react';
 import GithubCorner from 'react-github-corner';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { clearLoadedBundles, loadAllUrls } from '../redux/actions';
+import { clearLoadedBundles, ILoadableResource, loadAllUrls } from '../redux/actions';
 import {
   BundleStateMap,
   getBundleErrors,
@@ -20,7 +20,7 @@ interface IProps {
   defaultUrls: string[];
   bundleStates: BundleStateMap;
   bundleErrors: IRetrievalError[];
-  load(urls: string[]): void;
+  load(urls: ILoadableResource[]): void;
   complete(): void;
   cancel(): void;
 }
@@ -73,9 +73,17 @@ class EnterUrlsComponent extends React.PureComponent<IProps, IState> {
             value={this.state.urls}
             onChange={this.onChange}
           />
-          <Button onClick={this.load} disabled={!this.state.urls.trim()}>
-            Load
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Button onClick={this.load} disabled={!this.state.urls.trim()}>
+              Load URLs
+            </Button>
+            <div className={styles.upload}>
+              <input type="file" multiple onChange={this.loadFiles} />
+              <Button onClick={this.load} variant="blue">
+                Upload
+              </Button>
+            </div>
+          </div>
         </>
       );
     }
@@ -91,12 +99,27 @@ class EnterUrlsComponent extends React.PureComponent<IProps, IState> {
     );
   }
 
+  private readonly loadFiles = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    const files: File[] = [];
+    for (let i = 0; i < evt.target.files!.length; i++) {
+      const file = evt.target.files!.item(i);
+      if (file) {
+        files.push(file);
+      }
+    }
+
+    if (files.length > 0) {
+      this.props.load(files.map(file => ({ url: `file://${file.name}`, file })));
+    }
+  };
+
   private readonly load = () => {
     this.props.load(
       this.state.urls
         .split('\n')
         .map(u => u.trim())
-        .filter(Boolean),
+        .filter(Boolean)
+        .map(url => ({ url })),
     );
   };
 
@@ -112,8 +135,8 @@ export const EnterUrls = connect(
     bundleStates: getGroupedBundleState(state),
   }),
   dispatch => ({
-    load(urls: string[]) {
-      dispatch(loadAllUrls({ urls }));
+    load(urls: ILoadableResource[]) {
+      dispatch(loadAllUrls({ resources: urls }));
     },
     cancel() {
       dispatch(clearLoadedBundles());

@@ -3,6 +3,11 @@ import { ActionType, createAsyncAction, createStandardAction } from 'typesafe-ac
 import { Stats } from 'webpack';
 import { IBundlephobiaStats } from './services/bundlephobia-api';
 
+export interface ILoadableResource {
+  url: string;
+  file?: File;
+}
+
 /**
  * Requests analysis to run for a bundle.
  */
@@ -12,10 +17,10 @@ export const doAnalysis = createAsyncAction(
   'doAnalysisFailure',
   'doAnalysisCancel',
 )<
-  { url: string },
-  { url: string; data: Stats.ToJsonOutput },
-  IError & { url: string },
-  { url: string }
+  { resource: ILoadableResource },
+  { resource: ILoadableResource; data: Stats.ToJsonOutput },
+  IError & { resource: ILoadableResource },
+  { resource: ILoadableResource }
 >();
 
 /**
@@ -30,7 +35,9 @@ export const fetchBundlephobiaData = createAsyncAction(
 /**
  * Loads bundles for all the requested urls.
  */
-export const loadAllUrls = createStandardAction('loadAllUrls')<{ urls: string[] }>();
+export const loadAllUrls = createStandardAction('loadAllUrls')<{
+  resources: ILoadableResource[];
+}>();
 
 /**
  * Clears loaded bundles.

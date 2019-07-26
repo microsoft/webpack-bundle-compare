@@ -17,7 +17,7 @@
 @mixin size($name, $hpad, $wpad, $min-width) {
   &[data-variant*="#{$name}"] {
     padding: $hpad $wpad;
-    width: $min-width;
+    min-width: $min-width;
   }
 }
 

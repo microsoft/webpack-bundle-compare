@@ -24,10 +24,10 @@ const seedFromQueryStringEpic: Epic = () => {
 
   return of(
     loadAllUrls({
-      urls: query
+      resources: query
         .slice(index + prefix.length)
         .split(',')
-        .map(Base64.decode),
+        .map(url => ({ url: Base64.decode(url) })),
     }),
   ).pipe(delay(100));
 };
@@ -35,7 +35,7 @@ const seedFromQueryStringEpic: Epic = () => {
 const loadAllUrlsEpic: Epic = actions =>
   actions.pipe(
     filter(isActionOf(loadAllUrls)),
-    mergeMap(action => action.payload.urls.map(url => doAnalysis.request({ url }))),
+    mergeMap(action => action.payload.resources.map(url => doAnalysis.request({ resource: url }))),
   );
 
 const loadBundlephobiaInfoEpic: Epic = (actions, _, { bundlephobia }) =>

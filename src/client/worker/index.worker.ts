@@ -8,7 +8,7 @@ const ctx: Worker = self as any;
 const mapAction = (action: CompareAction): Observable<CompareAction> => {
   switch (action.type) {
     case getType(doAnalysis.request):
-      return download(action.payload.url);
+      return download(action.payload.resource);
     default:
       return EMPTY;
   }

@@ -56,33 +56,36 @@ export const reducer = (state = initialState, action: CompareAction): IAppState 
     case getType(loadAllUrls):
       return {
         ...state,
-        bundles: action.payload.urls.reduce((acc, url) => ({ ...acc, [url]: idleRetrieval }), {}),
+        bundles: action.payload.resources.reduce(
+          (acc, res) => ({ ...acc, [res.url]: idleRetrieval }),
+          {},
+        ),
       };
     case getType(doAnalysis.request):
       return {
         ...state,
-        bundles: { ...state.bundles, [action.payload.url]: workingRetrival },
+        bundles: { ...state.bundles, [action.payload.resource.url]: workingRetrival },
       };
     case getType(doAnalysis.success):
       return {
         ...state,
         bundles:
-          getBundleData(action.payload.url)(state).state === RetrievalState.Retrieving
-            ? { ...state.bundles, [action.payload.url]: success(action.payload.data) }
+          getBundleData(action.payload.resource.url)(state).state === RetrievalState.Retrieving
+            ? { ...state.bundles, [action.payload.resource.url]: success(action.payload.data) }
             : state.bundles,
       };
     case getType(doAnalysis.failure):
       return {
         ...state,
         bundles:
-          getBundleData(action.payload.url)(state).state === RetrievalState.Retrieving
-            ? { ...state.bundles, [action.payload.url]: error(action.payload) }
+          getBundleData(action.payload.resource.url)(state).state === RetrievalState.Retrieving
+            ? { ...state.bundles, [action.payload.resource.url]: error(action.payload) }
             : state.bundles,
       };
     case getType(doAnalysis.cancel):
       return {
         ...state,
-        bundles: { ...state.bundles, [action.payload.url]: idleRetrieval },
+        bundles: { ...state.bundles, [action.payload.resource.url]: idleRetrieval },
       };
     case getType(fetchBundlephobiaData.request):
       return {
