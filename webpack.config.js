@@ -54,7 +54,7 @@ module.exports = {
     new DefinePlugin({
       INITIAL_FILES: process.env.WBC_FILES
         ? JSON.stringify(process.env.WBC_FILES.split(','))
-        : JSON.stringify(['public/samples/spectrum1.msp.gz', 'public/samples/spectrum2.msp.gz']),
+        : JSON.stringify(['public/samples/sample1.msp.gz', 'public/samples/sample2.msp.gz']),
     }),
   ],
   devServer: {

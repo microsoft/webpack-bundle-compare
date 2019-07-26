@@ -43,5 +43,7 @@ jspm_packages
 .node_repl_history
 
 /public/samples
+!/public/samples/sample1.msp.gz
+!/public/samples/sample2.msp.gz
 /dist
 /.vscode
