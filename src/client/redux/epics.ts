@@ -24,8 +24,7 @@ const seedFromQueryStringEpic: Epic = () => {
 
   return of(
     loadAllUrls({
-      resources: query
-        .slice(index + prefix.length)
+      resources: decodeURIComponent(query.slice(index + prefix.length))
         .split(',')
         .map(url => ({ url: Base64.decode(url) })),
     }),
