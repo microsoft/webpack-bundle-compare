@@ -50,7 +50,7 @@ module.exports = {
       title: 'Webpack Bundle Compare',
     }),
     new CopyPlugin({
-      patterns: [{ from: 'public/**/*.*', to: 'public' }],
+      patterns: [{ from: path.join(__dirname, 'public'), to: 'public' }],
     }),
     new DefinePlugin({
       INITIAL_FILES: process.env.WBC_FILES
