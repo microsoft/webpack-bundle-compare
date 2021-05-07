@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as styles from './progress-bar.component.scss';
+import styles from './progress-bar.component.scss';
 import { classes } from './util';
 
 interface IProps {

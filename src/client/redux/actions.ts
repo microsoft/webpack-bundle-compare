@@ -1,6 +1,6 @@
 import { IError } from '@mixer/retrieval';
-import { ActionType, createAsyncAction, createStandardAction } from 'typesafe-actions';
-import { Stats } from 'webpack';
+import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
+import { StatsCompilation } from 'webpack';
 import { IBundlephobiaStats } from './services/bundlephobia-api';
 
 export interface ILoadableResource {
@@ -18,7 +18,7 @@ export const doAnalysis = createAsyncAction(
   'doAnalysisCancel',
 )<
   { resource: ILoadableResource },
-  { resource: ILoadableResource; data: Stats.ToJsonOutput },
+  { resource: ILoadableResource; data: StatsCompilation },
   IError & { resource: ILoadableResource },
   { resource: ILoadableResource }
 >();
@@ -35,19 +35,19 @@ export const fetchBundlephobiaData = createAsyncAction(
 /**
  * Loads bundles for all the requested urls.
  */
-export const loadAllUrls = createStandardAction('loadAllUrls')<{
+export const loadAllUrls = createAction('loadAllUrls')<{
   resources: ILoadableResource[];
 }>();
 
 /**
  * Clears loaded bundles.
  */
-export const clearLoadedBundles = createStandardAction('clearLoadedBundles')();
+export const clearLoadedBundles = createAction('clearLoadedBundles')();
 
 /**
  * Indicates that a webworker errored.
  */
-export const webworkerErrored = createStandardAction('webworkerErrored')<IError>();
+export const webworkerErrored = createAction('webworkerErrored')<IError>();
 
 export type CompareAction = ActionType<
   | typeof doAnalysis

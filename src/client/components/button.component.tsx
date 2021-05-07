@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as styles from './button.component.scss';
+import styles from './button.component.scss';
 import { classes } from './util';
 
 type Props = React.DetailedHTMLProps<

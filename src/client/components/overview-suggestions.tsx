@@ -1,24 +1,24 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
 import { IoIosInformationCircleOutline, IoIosThumbsUp } from 'react-icons/io';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import {
   getEntryChunkSize,
   getNodeModuleSize,
   getTotalChunkSize,
   getTreeShakablePercent,
 } from '../stat-reducers';
-import * as styles from './overview-suggestions.component.scss';
+import styles from './overview-suggestions.component.scss';
 import { classes, formatPercent } from './util';
 
 interface IProps {
-  first: Stats.ToJsonOutput;
-  last: Stats.ToJsonOutput;
+  first: StatsCompilation;
+  last: StatsCompilation;
 }
 
 const epsilon = 1024 * 2;
 
-function nodeModuleSizeTip(first: Stats.ToJsonOutput, last: Stats.ToJsonOutput) {
+function nodeModuleSizeTip(first: StatsCompilation, last: StatsCompilation) {
   const firstNodeModuleSize = getNodeModuleSize(first);
   const lastNodeModuleSize = getNodeModuleSize(last);
   if (lastNodeModuleSize > firstNodeModuleSize + epsilon) {
@@ -51,7 +51,7 @@ function nodeModuleSizeTip(first: Stats.ToJsonOutput, last: Stats.ToJsonOutput) 
   return null;
 }
 
-function entrypointTip(last: Stats.ToJsonOutput) {
+function entrypointTip(last: StatsCompilation) {
   const totalSize = getTotalChunkSize(last);
   const entrySize = getEntryChunkSize(last);
   const isMajority = entrySize > totalSize / 2;
@@ -83,7 +83,7 @@ function entrypointTip(last: Stats.ToJsonOutput) {
   return null;
 }
 
-function treeShakeTip(last: Stats.ToJsonOutput) {
+function treeShakeTip(last: StatsCompilation) {
   const percent = getTreeShakablePercent(last);
   if (percent > 0.8) {
     return;

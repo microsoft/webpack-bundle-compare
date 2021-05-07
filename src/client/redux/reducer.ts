@@ -5,17 +5,17 @@ import {
   Retrieval,
   RetrievalState,
   success,
-  workingRetrival,
+  workingRetrival
 } from '@mixer/retrieval';
 import { createSelector } from 'reselect';
 import { getType } from 'typesafe-actions';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import {
   clearLoadedBundles,
   CompareAction,
   doAnalysis,
   fetchBundlephobiaData,
-  loadAllUrls,
+  loadAllUrls
 } from './actions';
 import { IBundlephobiaStats } from './services/bundlephobia-api';
 
@@ -31,7 +31,7 @@ export interface IAppState {
   /**
    * List of bundle loading states.
    */
-  bundles: Readonly<{ [url: string]: Retrieval<Stats.ToJsonOutput> }>;
+  bundles: Readonly<{ [url: string]: Retrieval<StatsCompilation> }>;
 
   /**
    * Mapping of bundlephobia dependency information.
@@ -130,7 +130,7 @@ export const getBundleData = (url: string) => (state: IAppState) =>
 export const getKnownStats = createSelector(
   getBundleMap,
   map => {
-    const output: Stats.ToJsonOutput[] = [];
+    const output: StatsCompilation[] = [];
     for (const key of Object.keys(map)) {
       const value = map[key];
       if (value.state === RetrievalState.Succeeded) {

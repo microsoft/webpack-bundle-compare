@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { color, formatValue } from '../util';
 import { BasePanel } from './base-panel.component';
-import * as styles from './panels.component.scss';
+import styles from './panels.component.scss';
 import { StatDelta } from './stat-delta.component';
 
 interface IProps {

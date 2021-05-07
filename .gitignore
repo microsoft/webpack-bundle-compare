@@ -42,8 +42,4 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-/public/samples
-!/public/samples/sample1.msp.gz
-!/public/samples/sample2.msp.gz
 /dist
-/.vscode

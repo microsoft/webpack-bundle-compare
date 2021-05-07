@@ -1,6 +1,6 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import {
   getImportsOfName,
   getWebpackModulesMap,
@@ -14,8 +14,8 @@ import { PanelArrangement } from './panels/panel-arrangement.component';
 
 export const DashboardOwnModulePage: React.FC<{
   name: string;
-  first: Stats.ToJsonOutput;
-  last: Stats.ToJsonOutput;
+  first: StatsCompilation;
+  last: StatsCompilation;
 }> = ({ first, last, name }) => {
   const firstRoot = getWebpackModulesMap(first)[name];
   const lastRoot = getWebpackModulesMap(last)[name];
@@ -34,7 +34,7 @@ export const DashboardOwnModulePage: React.FC<{
           <PanelArrangement>
             <CounterPanel
               title="Total Size"
-              value={lastRoot ? lastRoot.size : 0}
+              value={lastRoot?.size ?? 0}
               oldValue={firstRoot ? firstRoot.size : 0}
               formatter={filesize}
             />

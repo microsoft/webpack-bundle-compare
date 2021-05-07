@@ -1,4 +1,4 @@
-import { Stats } from 'webpack';
+import { Stats, StatsCompilation, StatsModule } from 'webpack';
 
 const anyPathSeparator = /\/|\\/;
 
@@ -62,14 +62,14 @@ const cacheByArg = <T extends Function>(fn: T): T => {
 /**
  * Returns the size of all chunks from the stats.
  */
-export const getTotalChunkSize = cacheByArg((stats: Stats.ToJsonOutput) =>
+export const getTotalChunkSize = cacheByArg((stats: StatsCompilation) =>
   stats.chunks!.reduce((sum, chunk) => sum + chunk.size, 0),
 );
 
 /**
  * Returns the size of the entry chunk(s).
  */
-export const getEntryChunkSize = cacheByArg((stats: Stats.ToJsonOutput) =>
+export const getEntryChunkSize = cacheByArg((stats: StatsCompilation) =>
   stats.chunks!.filter(c => c.entry).reduce((sum, chunk) => sum + chunk.size, 0),
 );
 
@@ -99,7 +99,7 @@ export interface INodeModule {
   /**
    * Modules imported from this dependency.
    */
-  modules: Stats.FnModules[];
+  modules: StatsModule[];
 
   /**
    * Type of the node module.
@@ -129,26 +129,26 @@ export const getNodeModuleFromIdentifier = (identifier: string): string | null =
   return null;
 };
 
-const concatParents = new WeakMap<Stats.FnModules, Stats.FnModules>();
+const concatParents = new WeakMap<StatsModule, StatsModule>();
 
 /**
  * Returns the concatenation parent in which the given module resides. Will
  * returnt he module itself if it's already top-level.
  */
-export const getConcatenationParent = (m: Stats.FnModules): Stats.FnModules =>
+export const getConcatenationParent = (m: StatsModule): StatsModule =>
   concatParents.get(m) || m;
 
 /**
  * Get webpack modules, either globally ro in a single chunk.
  */
-export const getWebpackModules = cacheByArg((stats: Stats.ToJsonOutput, filterToChunk?: number) => {
-  const modules: Stats.FnModules[] = [];
+export const getWebpackModules = cacheByArg((stats: StatsCompilation, filterToChunk?: number) => {
+  const modules: StatsModule[] = [];
   if (!stats.modules) {
     return modules;
   }
 
   for (const parent of stats.modules) {
-    if (filterToChunk !== undefined && !parent.chunks.includes(filterToChunk)) {
+    if (filterToChunk !== undefined && !parent.chunks?.includes(filterToChunk)) {
       continue;
     }
 
@@ -172,8 +172,8 @@ export const getWebpackModules = cacheByArg((stats: Stats.ToJsonOutput, filterTo
  * Returns a mapping of normalized identifiers in the chunk to module data.
  */
 export const getWebpackModulesMap = cacheByArg(
-  (stats: Stats.ToJsonOutput, filterToChunk?: number) => {
-    const mapping: { [name: string]: Stats.FnModules } = {};
+  (stats: StatsCompilation, filterToChunk?: number) => {
+    const mapping: { [name: string]: StatsModule } = {};
     for (const m of getWebpackModules(stats, filterToChunk)) {
       mapping[normalizeName(m.name)] = m;
     }
@@ -185,7 +185,7 @@ export const getWebpackModulesMap = cacheByArg(
 /**
  * Gets the type of import of the given module.
  */
-export const getImportType = (importedModule: Stats.FnModules) => {
+export const getImportType = (importedModule: StatsModule) => {
   let flags = 0;
   for (const reason of getReasons(importedModule)) {
     if (reason.type) {
@@ -203,11 +203,11 @@ export const getImportType = (importedModule: Stats.FnModules) => {
 /**
  * Returns the number of dependencies.
  */
-export const getNodeModules = cacheByArg((stats: Stats.ToJsonOutput, inChunk?: number) => {
+export const getNodeModules = cacheByArg((stats: StatsCompilation, inChunk?: number) => {
   const modules: { [key: string]: INodeModule } = {};
 
   for (const importedModule of getWebpackModules(stats, inChunk)) {
-    const packageName = getNodeModuleFromIdentifier(importedModule.identifier);
+    const packageName = getNodeModuleFromIdentifier(importedModule.identifier!);
     if (!packageName) {
       continue;
     }
@@ -217,12 +217,12 @@ export const getNodeModules = cacheByArg((stats: Stats.ToJsonOutput, inChunk?: n
     if (!previous) {
       modules[packageName] = {
         name: packageName,
-        totalSize: importedModule.size,
+        totalSize: importedModule.size || 0,
         modules: [importedModule],
         importType: moduleType,
       };
     } else {
-      previous.totalSize += importedModule.size;
+      previous.totalSize += importedModule.size || 0;
       previous.importType |= moduleType;
       previous.modules.push(importedModule);
     }
@@ -269,16 +269,16 @@ export interface IWebpackModuleComparisonOutput {
   fromSize: number;
   toSize: number;
   nodeModule?: string;
-  old?: Stats.FnModules;
-  new?: Stats.FnModules;
+  old?: StatsModule;
+  new?: StatsModule;
 }
 
 /**
  * Returns a grouped comparison of the old and new modules from the stats.
  */
 export const compareAllModules = (
-  oldStats: Stats.ToJsonOutput,
-  newStats: Stats.ToJsonOutput,
+  oldStats: StatsCompilation,
+  newStats: StatsCompilation,
   inChunk?: number,
 ) => {
   const oldModules = getWebpackModules(oldStats, inChunk);
@@ -286,29 +286,37 @@ export const compareAllModules = (
 
   const output: { [name: string]: IWebpackModuleComparisonOutput } = {};
   for (const m of oldModules) {
+    if (!m.identifier) {
+      continue;
+    }
+
     const normalized = normalizeName(m.name);
     output[normalized] = {
       name: normalized,
       type: identifyModuleType(m.identifier),
       nodeModule: getNodeModuleFromIdentifier(m.identifier) || undefined,
       toSize: 0,
-      fromSize: m.size,
+      fromSize: m.size || 0,
       old: m,
     };
   }
 
   for (const m of newModules) {
+    if (!m.identifier) {
+      continue;
+    }
+
     const normalized = normalizeName(m.name);
     if (output[normalized]) {
       output[normalized].new = m;
-      output[normalized].toSize = m.size;
+      output[normalized].toSize = m.size || 0;
     } else {
       output[normalized] = {
         name: normalized,
         type: identifyModuleType(m.identifier),
         nodeModule: getNodeModuleFromIdentifier(m.identifier) || undefined,
         fromSize: 0,
-        toSize: m.size,
+        toSize: m.size || 0,
         new: m,
       };
     }
@@ -330,8 +338,8 @@ export interface INodeModuleComparisonOutput {
  * Returns a grouped comparison of the old and new modules from the stats.
  */
 export const compareNodeModules = (
-  oldStats: Stats.ToJsonOutput,
-  newStats: Stats.ToJsonOutput,
+  oldStats: StatsCompilation,
+  newStats: StatsCompilation,
   inChunk?: number,
 ) => {
   const oldModules = getNodeModules(oldStats, inChunk);
@@ -356,7 +364,7 @@ export const compareNodeModules = (
 /**
  * Gets the number of node modules.
  */
-export const getNodeModuleSize = cacheByArg((stats: Stats.ToJsonOutput, inChunk?: number) => {
+export const getNodeModuleSize = cacheByArg((stats: StatsCompilation, inChunk?: number) => {
   let total = 0;
   const modules = getNodeModules(stats, inChunk);
   for (const key of Object.keys(modules)) {
@@ -369,13 +377,13 @@ export const getNodeModuleSize = cacheByArg((stats: Stats.ToJsonOutput, inChunk?
 /**
  * Gets the number of node modules.
  */
-export const getNodeModuleCount = (stats: Stats.ToJsonOutput, inChunk?: number) =>
+export const getNodeModuleCount = (stats: StatsCompilation, inChunk?: number) =>
   Object.keys(getNodeModules(stats, inChunk)).length;
 
 /**
  * Gets the number of node modules.
  */
-export const getTreeShakablePercent = cacheByArg((stats: Stats.ToJsonOutput, inChunk?: number) => {
+export const getTreeShakablePercent = cacheByArg((stats: StatsCompilation, inChunk?: number) => {
   const modules = Object.values(getNodeModules(stats, inChunk));
   if (modules.length === 0) {
     return 1;
@@ -394,13 +402,13 @@ export const getTreeShakablePercent = cacheByArg((stats: Stats.ToJsonOutput, inC
 /**
  * Gets the number of node modules.
  */
-export const getTotalModuleCount = (stats: Stats.ToJsonOutput, inChunk?: number) =>
+export const getTotalModuleCount = (stats: StatsCompilation, inChunk?: number) =>
   getWebpackModules(stats, inChunk)!.length;
 
 /**
  * Gets the number of node modules.
  */
-export const getAverageChunkSize = (stats: Stats.ToJsonOutput) => {
+export const getAverageChunkSize = (stats: StatsCompilation) => {
   let sum = 0;
   for (const chunk of stats.chunks!) {
     sum += chunk.size;
@@ -434,18 +442,18 @@ export interface IModuleTreeNode {
 /**
  * Gets the reasons that the module was imported. Fix for broken webpack typings here.
  */
-export const getReasons = (m: Stats.FnModules): Stats.Reason[] => m.reasons as any;
+export const getReasons = (m: StatsModule): Stats.Reason[] => m.reasons as any;
 
 /**
  * Gets all direct imports of the given node module.
  */
-export const getDirectImportsOfNodeModule = (stats: Stats.ToJsonOutput, name: string) =>
-  stats.modules!.filter(m => getNodeModuleFromIdentifier(m.name) === name);
+export const getDirectImportsOfNodeModule = (stats: StatsCompilation, name: string) =>
+  stats.modules!.filter(m => m.name && getNodeModuleFromIdentifier(m.name) === name);
 
 /**
  * Gets all direct imports of the given node module.
  */
-export const getImportsOfName = (stats: Stats.ToJsonOutput, name: string): Stats.FnModules[] => {
+export const getImportsOfName = (stats: StatsCompilation, name: string): StatsModule[] => {
   const modules = getWebpackModulesMap(stats);
   const root = modules[name];
   if (!root) {

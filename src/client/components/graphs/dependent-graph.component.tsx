@@ -2,21 +2,21 @@ import * as cytoscape from 'cytoscape';
 import { Base64 } from 'js-base64';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { Stats } from 'webpack';
+import { StatsCompilation, StatsModule } from 'webpack';
 import {
   compareAllModules,
   getDirectImportsOfNodeModule,
   getImportsOfName,
   getNodeModuleFromIdentifier,
   normalizeName,
-  replaceLoaderInIdentifier,
+  replaceLoaderInIdentifier
 } from '../../stat-reducers';
 import { color, linkToModule, linkToNodeModule } from '../util';
 import { expandModuleComparison, LazyBaseGraph } from './graph-tool';
 
 interface IProps {
-  previous: Stats.ToJsonOutput;
-  stats: Stats.ToJsonOutput;
+  previous: StatsCompilation;
+  stats: StatsCompilation;
   chunkId?: number;
 }
 
@@ -27,7 +27,7 @@ interface IState {
 }
 
 const createDependentGraph = <P extends {}>(
-  rootFinder: (props: IProps & P) => Stats.FnModules[],
+  rootFinder: (props: IProps & P) => StatsModule[],
   rootLabel: (props: IProps & P) => string,
 ) =>
   withRouter(
@@ -91,6 +91,10 @@ const createDependentGraph = <P extends {}>(
         });
 
         for (const direct of directImports) {
+          if (!direct.name) {
+            continue;
+          }
+
           const directId = Base64.encodeURI(direct.name);
           edges.push({
             data: {
@@ -123,7 +127,7 @@ export const NodeModuleDependentGraph = createDependentGraph<{ name: string }>(
 /**
  * Graphs the dependent tree for a node module.
  */
-export const GenericDependentGraph = createDependentGraph<{ root: Stats.FnModules }>(
-  props => getImportsOfName(props.stats, props.root.name),
+export const GenericDependentGraph = createDependentGraph<{ root: StatsModule }>(
+  props => props.root.name ? getImportsOfName(props.stats, props.root.name) : [],
   props => replaceLoaderInIdentifier(props.root.name),
 );

@@ -1,7 +1,7 @@
 import * as cytoscape from 'cytoscape';
 import * as React from 'react';
 import { IoIosContract, IoIosExpand } from 'react-icons/io';
-import * as styles from './base-graph.component.scss';
+import styles from './base-graph.component.scss';
 import { filterUnattachedEdges } from './graph-tool';
 
 // tslint:disable-next-line
@@ -197,10 +197,7 @@ export default class BaseGraph extends React.PureComponent<IProps, { filter: Fil
 
     let lastPath: cytoscape.CollectionReturnValue | null = null;
     graph.on('mouseover', 'node', ev => {
-      lastPath = graph
-        .elements()
-        .dijkstra({ root: ev.target, directed: true })
-        .pathTo(root);
+      lastPath = graph.elements().dijkstra({ root: ev.target, directed: true }).pathTo(root);
       lastPath.addClass('highlighted');
     });
 

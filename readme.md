@@ -1,6 +1,6 @@
 # @mixer/webpack-bundle-compare
 
-This is a tool that allows you to compare webpack bundle analysis files over time. Check it out [here](https://webpackbundlecomparison.z5.web.core.windows.net).
+This is a tool that allows you to compare webpack bundle analysis files over time. Check it out [here](https://happy-water-0887b0b1e.azurestaticapps.net).
 
 ![](./screenshot.png)
 

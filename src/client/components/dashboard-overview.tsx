@@ -1,6 +1,6 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import {
   getAverageChunkSize,
   getEntryChunkSize,
@@ -10,12 +10,6 @@ import {
   getTotalModuleCount,
   getTreeShakablePercent,
 } from '../stat-reducers';
-import { ModuleTable } from './module-table.component';
-import { OverviewSuggestions } from './overview-suggestions';
-import { CounterPanel } from './panels/counter-panel.component';
-import { PanelArrangement } from './panels/panel-arrangement.component';
-import { formatDuration, formatPercent } from './util';
-
 import { ChunkGraph } from './graphs/chunk-graph.component';
 import {
   AverageChunkSize,
@@ -23,10 +17,15 @@ import {
   TreeShakeHint,
   WhatIsAnEntrypoint,
 } from './hints/hints.component';
+import { ModuleTable } from './module-table.component';
+import { OverviewSuggestions } from './overview-suggestions';
+import { CounterPanel } from './panels/counter-panel.component';
+import { PanelArrangement } from './panels/panel-arrangement.component';
+import { formatDuration, formatPercent } from './util';
 
 export const DashboardOverview: React.FC<{
-  first: Stats.ToJsonOutput;
-  last: Stats.ToJsonOutput;
+  first: StatsCompilation;
+  last: StatsCompilation;
 }> = ({ first, last }) => {
   return (
     <>

@@ -1,6 +1,6 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import {
   compareNodeModules,
   getNodeModuleCount,
@@ -19,8 +19,8 @@ import { formatPercent } from './util';
 
 export const DashboardChunkPage: React.FC<{
   chunk: number;
-  first: Stats.ToJsonOutput;
-  last: Stats.ToJsonOutput;
+  first: StatsCompilation;
+  last: StatsCompilation;
 }> = ({ first, last, chunk }) => {
   const firstObj = first.chunks!.find(c => c.id === chunk);
   const lastSize = last.chunks!.find(c => c.id === chunk);

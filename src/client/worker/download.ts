@@ -1,7 +1,7 @@
 import { decode } from 'msgpack-lite';
 import { inflate } from 'pako';
 import { from, Observable } from 'rxjs';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import { CompareAction, doAnalysis, ILoadableResource } from '../redux/actions';
 import { ErrorCode } from '../redux/reducer';
 import { Semaphore } from './semaphore';
@@ -52,14 +52,14 @@ export function download(resource: ILoadableResource): Observable<CompareAction>
   );
 }
 
-function processDownload(rawResponse: ArrayBuffer): Stats.ToJsonOutput {
+function processDownload(rawResponse: ArrayBuffer): StatsCompilation {
   const asArray = new Uint8Array(rawResponse);
   const data = asArray[0] === 0x1f && asArray[1] === 0x8b ? inflate(asArray) : asArray;
-  const stats: Stats.ToJsonOutput =
+  const stats: StatsCompilation =
     data[0] === '{'.charCodeAt(0) ? JSON.parse(new TextDecoder().decode(data)) : decode(data);
 
   if (stats.modules) {
-    stats.modules = stats.modules.filter(m => m.chunks.length !== 0);
+    stats.modules = stats.modules.filter(m => m.chunks && m.chunks.length !== 0);
   }
 
   return stats;

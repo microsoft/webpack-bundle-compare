@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { ImportType, INodeModule, INodeModuleComparisonOutput } from '../../stat-reducers';
 import { classes, color, linkToNodeModule } from '../util';
 import { BasePanel } from './base-panel.component';
-import * as styles from './panels.component.scss';
+import styles from './panels.component.scss';
 import { StatDelta } from './stat-delta.component';
 
 interface IProps {
@@ -24,16 +24,16 @@ const getSizeInChunk = (nodeModule?: INodeModule, chunk?: number) => {
 
   let sum = 0;
   for (const m of nodeModule.modules) {
-    if (m.chunks.includes(chunk)) {
-      sum += m.size;
+    if (m.chunks?.includes(chunk)) {
+      sum += m.size || 0;
     }
   }
 
   return sum;
 };
 
-export const NodeModulePanel = withRouter<IProps & RouteComponentProps<{}>>(
-  ({ comparison, inChunk, history }) => {
+export const NodeModulePanel = withRouter(
+  ({ comparison, inChunk, history }: IProps & RouteComponentProps<{}>) => {
     const oldSize = getSizeInChunk(comparison.old, inChunk);
     const newSize = getSizeInChunk(comparison.new, inChunk);
 

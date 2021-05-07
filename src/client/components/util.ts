@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import * as styles from './util.component.scss';
+import styles from './util.component.scss';
 
 export const classes = (...classList: Array<string | null | undefined>) => {
   let str = '';

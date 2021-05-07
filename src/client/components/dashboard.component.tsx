@@ -1,7 +1,8 @@
+import { Base64 } from 'js-base64';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Redirect, Route, RouteChildrenProps } from 'react-router';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import { getKnownStats, IAppState } from '../redux/reducer';
 import { DashboardChunkPage } from './dashboard-chunk-page.component';
 import {
@@ -13,10 +14,10 @@ import {
 import { DashboardNodeModulePage } from './dashboard-node-module-page.component';
 import { DashboardOverview } from './dashboard-overview';
 import { DashboardOwnModulePage } from './dashboard-own-module-page.component';
-import * as styles from './dashboard.component.scss';
+import styles from './dashboard.component.scss';
 
 interface IProps {
-  stats: Stats.ToJsonOutput[];
+  stats: StatsCompilation[];
 }
 
 class DashboardComponent extends React.PureComponent<IProps> {

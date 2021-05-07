@@ -2,15 +2,15 @@ import * as cytoscape from 'cytoscape';
 import { Base64 } from 'js-base64';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import { compareAllModules, getNodeModuleFromIdentifier } from '../../stat-reducers';
 import { Placeholder } from '../placeholder.component';
 import { linkToModule, linkToNodeModule } from '../util';
 import { expandModuleComparison, LazyBaseGraph } from './graph-tool';
 
 interface IProps {
-  previous: Stats.ToJsonOutput;
-  stats: Stats.ToJsonOutput;
+  previous: StatsCompilation;
+  stats: StatsCompilation;
   chunkId: number;
 }
 

@@ -1,12 +1,12 @@
 import * as cytoscape from 'cytoscape';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { Stats } from 'webpack';
+import { StatsCompilation } from 'webpack';
 import { fileSizeNode, LazyBaseGraph } from './graph-tool';
 
 interface IProps {
-  previous: Stats.ToJsonOutput;
-  stats: Stats.ToJsonOutput;
+  previous: StatsCompilation;
+  stats: StatsCompilation;
   maxBubbleArea?: number;
   minBubbleArea?: number;
 }
@@ -50,7 +50,8 @@ export const ChunkGraph = withRouter(
         const previous = this.props.previous.chunks!.find(c => c.id === chunk.id);
 
         // If the chunk has a friendly name, render that in the chart. Otherwise, list the chunk id.
-        const chunkLabel = chunk.names.length > 0 ? chunk.names[0] : `Chunk ${chunk.id}`;
+        const chunkLabel =
+          chunk.names && chunk.names.length > 0 ? chunk.names[0] : `Chunk ${chunk.id}`;
 
         return {
           data: fileSizeNode({
@@ -68,7 +69,7 @@ export const ChunkGraph = withRouter(
       const edges: cytoscape.EdgeDefinition[] = [];
 
       for (const chunk of chunks) {
-        for (const parent of chunk.parents) {
+        for (const parent of chunk.parents ?? []) {
           edges.push({
             data: {
               id: `edge${parent}to${chunk.id}`,

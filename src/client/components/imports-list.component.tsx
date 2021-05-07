@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Stats } from 'webpack';
+import { Stats, StatsModule } from 'webpack';
 import {
   getConcatenationParent,
   getImportType,
@@ -7,14 +7,14 @@ import {
   replaceLoaderInIdentifier,
 } from '../stat-reducers';
 import { ButWaitTheresMore } from './but-wait-theres-more.component';
-import * as styles from './imports-list.component.scss';
+import styles from './imports-list.component.scss';
 import { ModuleTypeBadge } from './panels/node-module-panel.component';
 import { Placeholder } from './placeholder.component';
 
 /**
  * Prints the list of modules that import the target modules.
  */
-export const ImportsList: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }) =>
+export const ImportsList: React.FC<{ targets: StatsModule[] }> = ({ targets }) =>
   targets.length === 0 ? (
     <Placeholder>This module is not imported in the lastest build.</Placeholder>
   ) : (
@@ -25,7 +25,8 @@ export const ImportsList: React.FC<{ targets: Stats.FnModules[] }> = ({ targets 
         return (
           <div key={i} className={styles.importBox}>
             <div className={styles.title}>
-              {target.name} in chunk {getConcatenationParent(target).chunks.join(', ')}
+              {target.name} in chunk{' '}
+              {getConcatenationParent(target).chunks?.join(', ') ?? '<anonymous>'}
               <span style={{ flex: 1 }} />
               <ModuleTypeBadge type={getImportType(target)} />
             </div>
@@ -41,7 +42,7 @@ export const ImportsList: React.FC<{ targets: Stats.FnModules[] }> = ({ targets 
 /**
  * Prints the list of issuers that import any of the target modules.
  */
-export const IssuerTree: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }) =>
+export const IssuerTree: React.FC<{ targets: StatsModule[] }> = ({ targets }) =>
   targets.length === 0 ? (
     <Placeholder>This module is not imported in the lastest build.</Placeholder>
   ) : (
@@ -52,7 +53,8 @@ export const IssuerTree: React.FC<{ targets: Stats.FnModules[] }> = ({ targets }
           target.issuerPath && (
             <div key={i} className={styles.importBox}>
               <div className={styles.title}>
-                {target.name} in chunk {getConcatenationParent(target).chunks.join(', ')}
+                {target.name} in chunk{' '}
+                {getConcatenationParent(target).chunks?.join(', ') ?? '<anonymous>'}
                 <span style={{ flex: 1 }} />
                 <ModuleTypeBadge type={getImportType(target)} />
               </div>

@@ -1,18 +1,17 @@
 import * as filesize from 'filesize';
 import { Cell, Column, ColumnCellProps, Table } from 'fixed-data-table-2';
+import 'fixed-data-table-2/dist/fixed-data-table.css';
 import * as React from 'react';
-import { Stats } from 'webpack';
+import { IoIosArrowRoundDown, IoIosArrowRoundUp } from 'react-icons/io';
+import { RouteComponentProps, withRouter } from 'react-router';
+import { StatsCompilation } from 'webpack';
 import {
   compareAllModules,
   getNodeModuleFromIdentifier,
   IWebpackModuleComparisonOutput,
   replaceLoaderInIdentifier,
 } from '../stat-reducers';
-import * as styles from './module-table.component.scss';
-
-import 'fixed-data-table-2/dist/fixed-data-table.css';
-import { IoIosArrowRoundDown, IoIosArrowRoundUp } from 'react-icons/io';
-import { RouteComponentProps, withRouter } from 'react-router';
+import styles from './module-table.component.scss';
 import {
   formatDifference,
   formatPercentageDifference,
@@ -21,8 +20,8 @@ import {
 } from './util';
 
 interface IProps {
-  first: Stats.ToJsonOutput;
-  last: Stats.ToJsonOutput;
+  first: StatsCompilation;
+  last: StatsCompilation;
   inChunk?: number;
 }
 

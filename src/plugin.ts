@@ -3,7 +3,7 @@ import { createWriteStream } from 'fs';
 import { createEncodeStream } from 'msgpack-lite';
 import { resolve } from 'path';
 import { PassThrough } from 'stream';
-import { Compiler, Stats } from 'webpack';
+import { Compiler, Stats, StatsCompilation } from 'webpack';
 import { createGzip } from 'zlib';
 
 export const enum StatsFormat {
@@ -51,7 +51,7 @@ const defaultFilename = (gzip: boolean, format: StatsFormat) => {
 
 const writeToStream = (
   options: IPluginOptions,
-  data: Stats.ToJsonOutput,
+  data: StatsCompilation,
   stream: NodeJS.WritableStream,
 ) => {
   if (options.format === StatsFormat.MsgPack) {
@@ -129,7 +129,8 @@ export class BundleComparisonPlugin {
     if (compiler.hooks) {
       compiler.hooks.done.tapAsync(BundleComparisonPlugin.name, handler);
     } else {
-      compiler.plugin('done', handler);
+      // webpack 3
+      (compiler as any).plugin('done', handler);
     }
   }
 }

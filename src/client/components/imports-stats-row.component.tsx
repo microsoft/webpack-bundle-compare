@@ -1,6 +1,6 @@
 import * as filesize from 'filesize';
 import * as React from 'react';
-import { Stats } from 'webpack';
+import { StatsModule } from 'webpack';
 import { getReasons } from '../stat-reducers';
 import { DependentModules, TotalNodeModuleSize, UniqueEntrypoints } from './hints/hints.component';
 import { CounterPanel } from './panels/counter-panel.component';
@@ -11,15 +11,15 @@ import { color } from './util';
  * Prints the list of modules that import the target modules.
  */
 export const ImportsStatsRow: React.FC<{
-  oldTargets: Stats.FnModules[];
-  newTargets: Stats.FnModules[];
+  oldTargets: StatsModule[];
+  newTargets: StatsModule[];
 }> = ({ oldTargets, newTargets }) => (
   <PanelArrangement>
     <CounterPanel
       title="Total Size"
       hint={TotalNodeModuleSize}
-      value={newTargets.reduce((acc, t) => acc + t.size, 0)}
-      oldValue={oldTargets.reduce((acc, t) => acc + t.size, 0)}
+      value={newTargets.reduce((acc, t) => acc + (t.size || 0), 0)}
+      oldValue={oldTargets.reduce((acc, t) => acc + (t.size || 0), 0)}
       formatter={filesize}
     />
     <CounterPanel

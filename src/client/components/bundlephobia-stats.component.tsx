@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { fetchBundlephobiaData } from '../redux/actions';
 import { getBundlephobiaData, IAppState } from '../redux/reducer';
 import { IBundlephobiaStats } from '../redux/services/bundlephobia-api';
-import * as styles from './bundlephobia-stats.component.scss';
+import styles from './bundlephobia-stats.component.scss';
 import { Errors } from './errors.component';
 import { SideEffectHint, TreeShakeHint } from './hints/hints.component';
 import { BasePanel } from './panels/base-panel.component';

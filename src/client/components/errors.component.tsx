@@ -1,6 +1,6 @@
 import { IError, IRetrievalError } from '@mixer/retrieval';
 import * as React from 'react';
-import * as styles from './errors.component.scss';
+import styles from './errors.component.scss';
 import { classes } from './util';
 
 interface IProps {

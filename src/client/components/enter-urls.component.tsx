@@ -12,7 +12,7 @@ import {
   IAppState,
 } from '../redux/reducer';
 import { Button } from './button.component';
-import * as styles from './enter-urls.component.scss';
+import styles from './enter-urls.component.scss';
 import { Errors } from './errors.component';
 import { ProgressBar } from './progress-bar.component';
 

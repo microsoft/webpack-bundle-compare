@@ -9,8 +9,8 @@ import {
   IoIosWarning,
 } from 'react-icons/io';
 import { Link, withRouter } from 'react-router-dom';
-import { Stats } from 'webpack';
-import * as styles from './dashboard-header.component.scss';
+import { StatsCompilation } from 'webpack';
+import styles from './dashboard-header.component.scss';
 
 const DashboardHeaderItem: React.FC<{ icon: IconType; href?: string | (() => void) }> = props => {
   const inner = (
@@ -34,8 +34,8 @@ const DashboardHeaderItem: React.FC<{ icon: IconType; href?: string | (() => voi
 };
 
 export const DashboardBuildDate: React.FC<{
-  first: Stats.ToJsonOutput;
-  last: Stats.ToJsonOutput;
+  first: StatsCompilation;
+  last: StatsCompilation;
 }> = ({ first, last }) => {
   const from = first.builtAt;
   const to = last.builtAt;
@@ -56,21 +56,21 @@ export const DashboardBuildDate: React.FC<{
   );
 };
 
-export const DashboardWarningCount: React.FC<{ last: Stats.ToJsonOutput }> = ({ last }) => (
+export const DashboardWarningCount: React.FC<{ last: StatsCompilation }> = ({ last }) => (
   <DashboardHeaderItem
     icon={IoIosWarning}
-    href={last.warnings.length ? '/dashboard/output' : undefined}
+    href={last.warnings?.length ? '/dashboard/output' : undefined}
   >
-    {last.warnings.length} Warnings
+    {last.warnings?.length ?? 0} Warnings
   </DashboardHeaderItem>
 );
 
-export const DashboardErrorCount: React.FC<{ last: Stats.ToJsonOutput }> = ({ last }) => (
+export const DashboardErrorCount: React.FC<{ last: StatsCompilation }> = ({ last }) => (
   <DashboardHeaderItem
     icon={IoIosCloseCircleOutline}
-    href={last.errors.length ? '/dashboard/output' : undefined}
+    href={last.errors?.length ? '/dashboard/output' : undefined}
   >
-    {last.errors.length} Errors
+    {last.errors?.length ?? 0} Errors
   </DashboardHeaderItem>
 );
 

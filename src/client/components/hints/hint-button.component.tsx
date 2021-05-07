@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IoIosInformationCircleOutline } from 'react-icons/io';
 import { classes } from '../util';
-import * as styles from './hint-button.component.scss';
+import styles from './hint-button.component.scss';
 
 export class HintButton extends React.PureComponent<
   { hint: React.ComponentType<{}>; className?: string },

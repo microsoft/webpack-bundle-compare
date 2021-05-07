@@ -35,7 +35,6 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: true,
-              localIdentName: '[local]__[hash:base64:5]',
             },
           },
           {
@@ -50,7 +49,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Webpack Bundle Compare',
     }),
-    new CopyPlugin([{ from: path.join(__dirname, 'public'), to: 'public' }]),
+    new CopyPlugin({
+      patterns: [{ from: 'public/**/*.*', to: 'public' }],
+    }),
     new DefinePlugin({
       INITIAL_FILES: process.env.WBC_FILES
         ? JSON.stringify(process.env.WBC_FILES.split(','))
