@@ -9,14 +9,14 @@ import {
   compareAllModules,
   getNodeModuleFromIdentifier,
   IWebpackModuleComparisonOutput,
-  replaceLoaderInIdentifier,
+  replaceLoaderInIdentifier
 } from '../stat-reducers';
 import styles from './module-table.component.scss';
 import {
   formatDifference,
   formatPercentageDifference,
   linkToModule,
-  linkToNodeModule,
+  linkToNodeModule
 } from './util';
 
 interface IProps {
@@ -124,7 +124,8 @@ export const ModuleTable = withRouter(
 
     private readonly nameCell = (props: ColumnCellProps) => {
       const { rowIndex, ...rest } = props;
-      return <Cell {...rest}>{replaceLoaderInIdentifier(this.state.diffs[rowIndex].name)}</Cell>;
+      const name = replaceLoaderInIdentifier(this.state.diffs[rowIndex].name);
+      return <Cell {...rest} title={name}>{name}</Cell>;
     };
 
     private readonly totalSizeCell = (props: ColumnCellProps) => {
