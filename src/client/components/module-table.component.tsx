@@ -9,14 +9,14 @@ import {
   compareAllModules,
   getNodeModuleFromIdentifier,
   IWebpackModuleComparisonOutput,
-  replaceLoaderInIdentifier
+  replaceLoaderInIdentifier,
 } from '../stat-reducers';
 import styles from './module-table.component.scss';
 import {
   formatDifference,
   formatPercentageDifference,
   linkToModule,
-  linkToNodeModule
+  linkToNodeModule,
 } from './util';
 
 interface IProps {
