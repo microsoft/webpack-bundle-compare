@@ -124,7 +124,8 @@ export const ModuleTable = withRouter(
 
     private readonly nameCell = (props: ColumnCellProps) => {
       const { rowIndex, ...rest } = props;
-      return <Cell {...rest}>{replaceLoaderInIdentifier(this.state.diffs[rowIndex].name)}</Cell>;
+      const name = replaceLoaderInIdentifier(this.state.diffs[rowIndex].name);
+      return <Cell {...rest} title={name}>{name}</Cell>;
     };
 
     private readonly totalSizeCell = (props: ColumnCellProps) => {
